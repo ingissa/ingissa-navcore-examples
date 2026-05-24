@@ -6,23 +6,31 @@
  * - NavCore engine with GPS updates
  * - Console output of state
  *
- * Run: npx tsx examples/01-basic-navigation/index.ts
+ * Run: npx tsx 01-basic-navigation/index.ts
  */
 
 import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
+import { MOCK_ROUTE } from './mock-route';
 
 async function main() {
-  // -- 1. Get route from OSRM (public demo server - use self-hosted in production) --
-  const provider = new OSRMDirectionsProvider({
-    baseUrl: 'http://router.project-osrm.org',
-    profile: 'driving',
-  });
+  // -- 1. Get route (live OSRM or pre-fetched fallback for StackBlitz) ------
+  let route: { geometry: [number, number][]; distance: number; duration: number };
 
-  console.log('Fetching route...');
-  const route = await provider.getRoute([
-    [2.3522, 48.8566],  // Paris center
-    [2.3009, 48.8741],  // Arc de Triomphe
-  ]);
+  try {
+    const provider = new OSRMDirectionsProvider({
+      baseUrl: 'http://router.project-osrm.org',
+      profile: 'driving',
+    });
+
+    console.log('Fetching route from OSRM...');
+    route = await provider.getRoute([
+      [2.3522, 48.8566],  // Paris center
+      [2.3009, 48.8741],  // Arc de Triomphe
+    ]);
+  } catch {
+    console.log('Network unavailable (StackBlitz?) - using pre-fetched route.\n');
+    route = MOCK_ROUTE;
+  }
 
   console.log(`Route: ${route.geometry.length} points, ${(route.distance / 1000).toFixed(1)}km, ${Math.round(route.duration / 60)}min`);
 
@@ -35,7 +43,7 @@ async function main() {
     arrivalThresholdMeters: 20,
   });
 
-  // -- 3. Listen to events -------------------------------------------------- 
+  // -- 3. Listen to events ---------------------------------------------------
   engine.on('routeLoaded', ({ routeLength }: any) => {
     console.log(`[OK] Route loaded (${routeLength} points)`);
   });
@@ -45,18 +53,18 @@ async function main() {
   });
 
   engine.on('arrival', () => {
-    console.log('   Arrived!');
+    console.log('    Arrived!');
   });
 
   engine.on('deviation', ({ anchorIndex }: any) => {
-    console.log(`[!]   Off-route at segment ${anchorIndex}`);
+    console.log(`[!] Off-route at segment ${anchorIndex}`);
   });
 
-  // -- 4. Load route -------------------------------------------------------- 
+  // -- 4. Load route ---------------------------------------------------------
   engine.setRoute(route.geometry);
   engine.startNavigation();
 
-  // -- 5. Simulate GPS updates along the route ------------------------------ 
+  // -- 5. Simulate GPS updates along the route -------------------------------
   console.log('\nSimulating navigation...\n');
 
   for (let i = 0; i < route.geometry.length; i += 5) {
@@ -76,7 +84,7 @@ async function main() {
       timestamp: Date.now() + i * 100,
     });
 
-    if (i % 50 === 0) {
+    if (i % 20 === 0) {
       const dist = state.distanceToDestination;
       console.log(
         `  [${i}] idx=${state.routeIndex}  ` +
