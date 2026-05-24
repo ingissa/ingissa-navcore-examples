@@ -17,7 +17,7 @@ import {
   VoiceTriggerEngine,
   InstructionEditor,
   OSRMDirectionsProvider,
-} from '../../packages/core/src/index';
+} from '@ingissa/navcore-core';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
@@ -48,7 +48,10 @@ async function main() {
   voice.setInstructions(instructions);
 
   // Create nav engine
-  const engine = new NavCore({ isDev: true });
+  const DEV_BYPASS_KEY =
+    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+
+  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
   engine.setRoute(geometry, instructions);
   engine.startNavigation();
 
@@ -82,3 +85,5 @@ async function main() {
 }
 
 main().catch(console.error);
+
+

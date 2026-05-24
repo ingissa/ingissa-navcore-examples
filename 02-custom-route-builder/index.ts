@@ -12,7 +12,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { CustomRouteBuilder, OSRMDirectionsProvider } from '../../packages/core/src/index';
+import { CustomRouteBuilder, OSRMDirectionsProvider } from '@ingissa/navcore-core';
 
 async function main() {
 
@@ -95,3 +95,5 @@ async function main() {
 }
 
 main().catch(console.error);
+
+

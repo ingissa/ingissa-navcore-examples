@@ -14,8 +14,8 @@ import {
   ValhallaDirectionsProvider,
   OpenRouteServiceProvider,
   type DirectionsResult,
-} from '../../packages/core/src/index';
-import { MapboxDirectionsProvider } from '../../packages/mapbox/src/index';
+} from '@ingissa/navcore-core';
+import { MapboxDirectionsProvider } from '@ingissa/navcore-mapbox';
 
 const START: [number, number] = [2.3522, 48.8566];
 const END:   [number, number] = [2.3009, 48.8741];
@@ -89,3 +89,5 @@ async function main() {
 }
 
 main();
+
+

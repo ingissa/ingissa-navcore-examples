@@ -9,7 +9,7 @@
  * Run: npx tsx examples/01-basic-navigation/index.ts
  */
 
-import { NavCore, OSRMDirectionsProvider } from '../../packages/core/src/index';
+import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
 
 async function main() {
   // ── 1. Get route from OSRM (public demo server — use self-hosted in production) ──
@@ -27,8 +27,11 @@ async function main() {
   console.log(`Route: ${route.geometry.length} points, ${(route.distance / 1000).toFixed(1)}km, ${Math.round(route.duration / 60)}min`);
 
   // ── 2. Create the engine ──────────────────────────────────────────────────
+  const DEV_BYPASS_KEY =
+    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+
   const engine = new NavCore({
-    isDev: true,  // Unlocks all features for development
+    licenseKey: DEV_BYPASS_KEY,  // Unlocks all features securely for development
     arrivalThresholdMeters: 20,
   });
 
@@ -91,3 +94,5 @@ async function main() {
 }
 
 main().catch(console.error);
+
+

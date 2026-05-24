@@ -13,7 +13,7 @@
 import {
   ParallelRoadResolver,
   type SnapCandidate,
-} from '../../packages/core/src/index';
+} from '@ingissa/navcore-core';
 
 function main() {
   const resolver = new ParallelRoadResolver({
@@ -125,3 +125,5 @@ function main() {
 }
 
 main();
+
+

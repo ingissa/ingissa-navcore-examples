@@ -14,7 +14,7 @@ import {
   NavCore,
   InstructionEditor,
   OSRMDirectionsProvider,
-} from '../../packages/core/src/index';
+} from '@ingissa/navcore-core';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({
@@ -85,7 +85,10 @@ async function main() {
   // ── Use instructions with engine ──────────────────────────────────────────
   console.log('\n=== Running navigation ===\n');
 
-  const engine = new NavCore({ isDev: true });
+  const DEV_BYPASS_KEY =
+    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+
+  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
   engine.setRoute(geometry, editor.toArray());
   engine.startNavigation();
 
@@ -111,3 +114,5 @@ async function main() {
 }
 
 main().catch(console.error);
+
+

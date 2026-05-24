@@ -69,7 +69,8 @@ export const HTML = `<!DOCTYPE html>
     });
 
     const adapter = new MapLibreAdapter(map);
-    const engine = new NavCore({ isDev: true });
+    const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+    const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
     const eta = new ETAEngine();
     const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 120 });
 
@@ -133,3 +134,5 @@ export const HTML = `<!DOCTYPE html>
 // Print the HTML to stdout so you can pipe it to a file:
 // npx tsx examples/04-maplibre-web/index.ts > public/index.html
 console.log(HTML);
+
+

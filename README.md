@@ -1,144 +1,108 @@
-# NavCore SDK — Examples
+# NavCore SDK — Examples Hub
 
-All examples are standalone TypeScript files. Run with `npx tsx`.
+Welcome to the **NavCore SDK Examples Hub**! This directory contains a comprehensive set of examples designed to demonstrate the versatility of the `@ingissa/navcore-sdk` navigation engine. 
 
-## Prerequisites
-
-```bash
-cd packages/navcore-sdk
-npm install
-```
-
-## Running Examples
-
-```bash
-# Basic navigation (OSRM + console)
-npx tsx examples/01-basic-navigation/index.ts
-
-# Custom route builder
-npx tsx examples/02-custom-route-builder/index.ts
-
-# Instruction editor (exam annotations)
-npx tsx examples/03-instruction-editor/index.ts
-
-# Directions provider comparison
-npx tsx examples/06-directions-providers/index.ts
-
-# Voice triggers
-npx tsx examples/07-voice-triggers/index.ts
-
-# ETA engine
-npx tsx examples/08-eta-engine/index.ts
-
-# Geofencing
-npx tsx examples/09-geofencing/index.ts
-
-# Parallel road resolver + U-turn detection
-npx tsx examples/10-parallel-road-resolver/index.ts
-
-# Headless testing
-npx tsx examples/11-headless-testing/index.ts
-```
-
-## Browser Examples (04, 05)
-
-Examples `04-maplibre-web` and `05-leaflet-web` generate HTML files:
-
-```bash
-# Generate HTML
-npx tsx examples/04-maplibre-web/index.ts > public/maplibre.html
-npx tsx examples/05-leaflet-web/index.ts  > public/leaflet.html
-
-# Serve (requires your app to bundle @ingissa/navcore-core and the adapter)
-```
-
-## Example Overview
-
-| # | Name | Feature | Network? |
-|---|---|---|---|
-| 01 | Basic Navigation | NavCore + OSRM | ✅ OSRM |
-| 02 | Custom Route Builder | CustomRouteBuilder, GPX, GeoJSON | ✅ OSRM |
-| 03 | Instruction Editor | InstructionEditor, exam points | ✅ OSRM |
-| 04 | MapLibre Web | MapLibreAdapter, camera follow | ✅ OSRM |
-| 05 | Leaflet Web | LeafletAdapter, OSM tiles | ✅ OSRM |
-| 06 | Directions Providers | OSRM, Valhalla, ORS comparison | ✅ All three |
-| 07 | Voice Triggers | VoiceTriggerEngine, priorities | ✅ OSRM |
-| 08 | ETA Engine | ETAEngine, rolling average | ✅ OSRM |
-| 09 | Geofencing | GeofencingEngine, circles/polygons | ❌ None |
-| 10 | Parallel Road Resolver | ParallelRoadResolver, U-turns | ❌ None |
-| 11 | Headless Testing | HeadlessAdapter, assertions | ✅ OSRM |
-| 12 | Expo Complete Navigation | Complete mobile app examples | ✅ Varies |
-
-> Examples 09 and 10 run entirely offline — no network required.
-
----
-
-# 12 — Expo Complete Navigation Examples
-
-A suite of **four production-quality navigation screens** built with the `@ingissa/navcore-sdk`. Each screen demonstrates the same core NavCore feature set (route snapping, ETA, voice cues, off-route detection, GPS simulation) rendered via a different map library.
-
----
-
-## 📁 Directory Structure
-
-```
-12-expo-complete-navigation/
-├── leaflet/        ✅ Expo Go compatible  (Leaflet + WebView + OSRM)
-├── google/         ⚠️  Expo Go (needs Google Maps API key + Google Play)
-├── mapbox/         🔧 Dev Build required  (@rnmapbox/maps)
-└── maplibre/       🔧 Dev Build required  (@maplibre/maplibre-react-native)
-```
+The examples are split into two categories:
+1. **Standalone CLI & Browser Demos (01 - 11)**: Pure TypeScript/Node files for offline core utility testing, rapid CLI verification, and static HTML browser visualizers.
+2. **Mobile Expo Complete Navigation Suite (12)**: A production-quality React Native navigation app demonstrating four map renderers (Leaflet, Google Maps, Mapbox, and MapLibre) running off a single unified navigation state and simulated GPS engine.
 
 ---
 
 ## 🗺️ Compatibility Matrix
 
-| Variant | Map Library | Directions | Works in Expo Go | Needs API Key |
-|---------|-------------|------------|-----------------|--------------|
-| **Leaflet** | Leaflet.js (WebView) | OSRM (free) | ✅ Yes | ❌ None |
-| **Google** | react-native-maps | OSRM (free) | ⚠️ Partial\* | ✅ Google Maps |
-| **Mapbox** | @rnmapbox/maps | Mapbox API | 🔧 Dev Build | ✅ Mapbox Public + Secret |
-| **MapLibre** | @maplibre/maplibre-react-native | Valhalla (free) | 🔧 Dev Build | ❌ None |
+### Standalone Demos (01 - 11)
 
-> \* Google Maps renders tiles in Expo Go only if Google Play Services is available on the device/emulator **and** a valid API key is provided.
+| Example | Title | Key Features Demonstrated | Network / API Dependency |
+|---------|-------|---------------------------|--------------------------|
+| **01** | Basic Navigation | Standard snapping & route progress updates | ✅ OSRM (free public API) |
+| **02** | Custom Route Builder | `CustomRouteBuilder`, GPX, and GeoJSON export | ✅ OSRM (free public API) |
+| **03** | Instruction Editor | `InstructionEditor` fluent custom turn additions | ✅ OSRM (free public API) |
+| **04** | MapLibre Web | HTML generation + `MapLibreAdapter` browser camera | ✅ OSRM (free public API) |
+| **05** | Leaflet Web | HTML generation + `LeafletAdapter` browser tiles | ✅ OSRM (free public API) |
+| **06** | Directions Providers | Comparative OSRM vs. Valhalla vs. OpenRouteService | ✅ All three providers |
+| **07** | Voice Triggers | Standalone `VoiceTriggerEngine` priority vocal queues | ✅ OSRM (free public API) |
+| **08** | ETA Engine | Standalone `ETAEngine` rolling average speed metrics | ✅ OSRM (free public API) |
+| **09** | Geofencing | Standalone offline `GeofencingEngine` zones | ❌ None (100% Offline) |
+| **10** | Parallel Road Snapping | `ParallelRoadResolver` U-turn scoring and protection | ❌ None (100% Offline) |
+| **11** | Headless Testing | CI/CD testing pipeline with programmatic mocks | ✅ OSRM (free public API) |
 
----
+### Mobile Expo Suite (12)
 
-## ✨ Features Demonstrated
+| Variant Screen | Map Renderer Library | Directions Provider | Works in Expo Go | Needs Key? | Setup Complexity |
+|----------------|----------------------|---------------------|------------------|------------|------------------|
+| **Leaflet** | Leaflet.js inside WebView | `OSRMDirectionsProvider` | ✅ Yes | ❌ None | 🟢 Low (None) |
+| **Google** | `react-native-maps` | `OSRMDirectionsProvider` | ⚠️ Partial\* | ✅ Google Maps | 🟡 Medium |
+| **Mapbox** | `@rnmapbox/maps` | `MapboxDirections` | 🔧 Dev Build | ✅ Mapbox Token | 🔴 High |
+| **MapLibre** | `@maplibre/maplibre` | `ValhallaDirectionsProvider` | 🔧 Dev Build | ❌ None | 🔴 High |
 
-All four variants demonstrate the same NavCore SDK features:
-
-| Feature | API |
-|---------|-----|
-| Route fetching | `OSRMDirectionsProvider` / `MapboxDirectionsProvider` / `ValhallaDirectionsProvider` |
-| Navigation engine | `useNavCore` |
-| Kalman-filtered GPS | `useNavCore` options |
-| Route snapping | `navState.snappedCoord` |
-| Off-route detection | `navState.isOffRoute` |
-| Turn-by-turn instructions | `NavInstruction[]` → `navState.nextInstructionIndex` |
-| Rolling ETA | `ETAEngine` |
-| Proximity voice cues | `VoiceTriggerEngine` |
-| Synthetic GPS simulation | `useSimulator` |
-| Arrival detection | `onArrival` callback |
-| Deviation detection | `onDeviation` callback |
+> \* Google Maps renders tiles in Expo Go only if Google Play Services is available on the emulator or device **and** a valid Maps API key is configured.
 
 ---
 
-## 🚀 Getting Started
+## 🏗️ Architecture & Data Flow
 
-### Prerequisites
+Below is the standard premium pipeline utilized across both the headless test frameworks and the React Native screens. A synthetic or live GPS signal is smoothed, snapped to a route, and fed into individual Pro engines to generate state variables:
 
-Make sure you have installed all dependencies from the monorepo root:
-
-```bash
-# From monorepo root
-npm install --legacy-peer-deps
-npx expo start --clear
+```mermaid
+graph TD
+    A[useSimulator / GPS Source] -->|Raw Lat, Long, Bearing| B[KalmanFilter2D]
+    B -->|Filtered Signal| C[RouteSnapper]
+    C -->|Snapped Lat, Long| D[useNavCore Orchestrator]
+    D -->|NavCoreState snappedCoord| E[Map Renderer Component]
+    D -->|Distance/Speed State| F[ETAEngine]
+    D -->|Progress State| G[VoiceTriggerEngine]
+    F -->|Rolling ETA & Duration| H[UI Banner]
+    G -->|VoiceCue text & priority| I[TTS Vocal Synthesizer]
 ```
 
-### Switching Between Variants
+---
 
-Edit `App.tsx` at the monorepo root:
+## 🚀 Installation & Prerequisites
+
+From the monorepo root directory, install all required dependencies (peer dependencies are handled via the legacy flag for mobile modules):
+
+```bash
+# Clean install all packages
+npm install --legacy-peer-deps
+```
+
+---
+
+## 💻 Running Standalone Examples (01 - 11)
+
+All standalone Node examples use direct TypeScript execution. Run them with `npx tsx`:
+
+```bash
+# Run basic snapping output
+npx tsx examples/01-basic-navigation/index.ts
+
+# Export custom routes to GPX
+npx tsx examples/02-custom-route-builder/index.ts
+
+# Test fluent instruction builder
+npx tsx examples/03-instruction-editor/index.ts
+
+# Generate static HTML visualizers
+npx tsx examples/04-maplibre-web/index.ts > public/maplibre.html
+npx tsx examples/05-leaflet-web/index.ts  > public/leaflet.html
+
+# Run offline engines
+npx tsx examples/09-geofencing/index.ts
+npx tsx examples/10-parallel-road-resolver/index.ts
+```
+
+---
+
+## 📱 Mobile Examples: Expo Complete Navigation (12)
+
+The `12-expo-complete-navigation` project is a fully-fledged Expo application containing four mobile screens:
+- `leaflet`: Leaflet.js map layer within a webview wrapper. **No native setups required!**
+- `google`: Standard Google Maps using standard native hooks.
+- `mapbox`: Premium vector-tile Mapbox rendering.
+- `maplibre`: Fully open-source MapLibre vector maps rendering.
+
+### Switching Active Screens
+To change which map screen is running in your active mobile simulator, modify the root `App.tsx` file inside the workspace:
 
 ```tsx
 import LeafletExample from './packages/navcore-sdk/examples/12-expo-complete-navigation/leaflet/index';
@@ -147,7 +111,7 @@ import MapboxExample  from './packages/navcore-sdk/examples/12-expo-complete-nav
 import MapLibreExample from './packages/navcore-sdk/examples/12-expo-complete-navigation/maplibre/index';
 
 export default function App() {
-    return <LeafletExample />;   // ← change this line to switch variants
+    return <LeafletExample />;   // ← Swap this to render a different map variant
     // return <GoogleExample />;
     // return <MapboxExample />;
     // return <MapLibreExample />;
@@ -156,178 +120,108 @@ export default function App() {
 
 ---
 
-## 📱 Variant Setup Guides
+## 🔧 Environment Variables Config (`.env.local`)
 
-### 1. Leaflet (Expo Go — No Setup Required)
-
-The easiest starting point. Uses a `WebView` with Leaflet.js loaded from CDN.
+To run the full suite of mobile examples, copy or create a `.env.local` file in the root workspace directory with the following variables:
 
 ```bash
-npx expo start
-# Press 'a' for Android or 'i' for iOS
-```
+# ── MAPBOX CONFIGURATION ──────────────────────────────────────────────────────
+# Public access token for runtime tile rendering
+EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_mapbox_public_token_here
 
-**Route**: Live Casablanca medina loop from the public OSRM API. Falls back to a pre-computed route if offline.
+# Secret access token used ONLY during gradle/cocoapod download phase
+RNMAPBOX_MAPS_DOWNLOAD_TOKEN=sk.your_mapbox_secret_download_token_here
 
----
+# ── GOOGLE MAPS CONFIGURATION ────────────────────────────────────────────────
+# API key for maps SDK
+EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyYourGoogleMapsApiKeyHere
 
-### 2. Google Maps
-
-Requires a Google Maps API Key and Google Play Services on your device/emulator.
-
-**Setup:**
-
-1. Create an API key at the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis).
-2. Enable the **Maps SDK for Android** and **Maps SDK for iOS**.
-3. Add to your `.env.local`:
-   ```bash
-   EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_key_here
-   ```
-4. Start Expo Go:
-   ```bash
-   npx expo start
-   ```
-
-> [!NOTE]
-> If the map appears blank, your emulator may not have Google Play Services. Use a **Google Play Store** system image when creating the emulator in Android Studio.
-
----
-
-### 3. Mapbox (Development Build Required)
-
-Uses `@rnmapbox/maps`, which is a **native module** not included in standard Expo Go.
-
-**Setup:**
-
-1. Get your tokens from [Mapbox Dashboard](https://account.mapbox.com/):
-   - **Public token** (starts with `pk.`) — for tile rendering at runtime.
-   - **Secret token** (starts with `sk.`) — for downloading the SDK during build.
-
-2. Add to your `.env.local`:
-   ```bash
-   EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_public_token
-   RNMAPBOX_MAPS_DOWNLOAD_TOKEN=sk.your_secret_token
-   ```
-
-3. Ensure `app.json` contains the plugin:
-   ```json
-   "plugins": [
-     ["@rnmapbox/maps", { "RNMapboxMapsVersion": "11.0.0" }]
-   ]
-   ```
-
-4. Build and run:
-   ```bash
-   npx expo prebuild
-   npx expo run:android
-   # or
-   npx expo run:ios
-   ```
-
----
-
-### 4. MapLibre (Development Build Required)
-
-Uses `@maplibre/maplibre-react-native` with a **Valhalla** directions backend (fully open-source, zero API keys).
-
-**Setup:**
-
-1. Build the development client:
-   ```bash
-   npx expo prebuild
-   npx expo run:android
-   ```
-
-2. (Optional) Self-host Valhalla for production:
-   ```bash
-   docker run -p 8002:8002 ghcr.io/valhalla/valhalla:latest
-   ```
-   Then set in `.env.local`:
-   ```bash
-   EXPO_PUBLIC_VALHALLA_URL=http://your-server:8002
-   ```
-   Without this variable, the example defaults to `https://valhalla1.openstreetmap.de` (free, rate-limited public instance).
-
----
-
-## 🔧 Metro Configuration
-
-The monorepo root contains a `metro.config.js` that redirects `@ingissa/navcore-*` imports directly to their TypeScript source files. This means:
-
-- **No build step required** for the SDK packages during development.
-- Changes to SDK source code are reflected immediately.
-- All TypeScript type-checking works correctly in your IDE.
-
-```js
-// metro.config.js (simplified)
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (moduleName.startsWith('@ingissa/navcore-')) {
-    // Points directly to src/index.ts of each internal package
-    return { filePath: path.resolve(projectRoot, `packages/navcore-sdk/packages/${internalPath}/src/index.ts`), type: 'sourceFile' };
-  }
-  return context.resolveRequest(context, moduleName, platform);
-};
-```
-
----
-
-## 🏗️ Architecture
-
-```
-useSimulator ────→ position (SimPosition)
-                         │
-                         ▼
-                   useNavCore
-                         │
-                    NavCoreState
-                         │
-             ┌───────────┼───────────┐
-             ▼           ▼           ▼
-         ETAEngine  VoiceTrigger  Map Component
-         (offline)   Engine      (Leaflet / Google
-                    (proximity)  / Mapbox / MapLibre)
-```
-
-### Data Flow
-
-1. **`useSimulator`** generates synthetic GPS positions along the route geometry.
-2. **`useNavCore`** consumes raw GPS, applies a Kalman filter, snaps to the route, tracks progress, and emits instruction/arrival events.
-3. **`ETAEngine`** maintains a rolling-window speed average to compute live ETA.
-4. **`VoiceTriggerEngine`** monitors distance to the next instruction and returns `VoiceCue` objects when the vehicle enters the trigger window.
-5. The **map component** receives the route GeoJSON and the snapped position to render the vehicle dot.
-
----
-
-## 🐛 Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| `Unable to resolve @ingissa/navcore-*` | Ensure `metro.config.js` is present at the monorepo root. Run `npx expo start --clear`. |
-| `@rnmapbox/maps native is not linked` | Switch to the Leaflet variant for Expo Go, or run `npx expo run:android` for a Dev Build. |
-| Google Maps shows blank | Check that your Google Maps API key is set in `.env.local` and your emulator has Google Play Services. |
-| `INSTALL_FAILED_INSUFFICIENT_STORAGE` | Wipe emulator data in Android Studio Device Manager. |
-| Voice cues not appearing | Start navigation first (press **▶ START**), then wait until the simulator advances near a waypoint. |
-| Mapbox `RNMapboxMapsDownloadToken is deprecated` | Use the `RNMAPBOX_MAPS_DOWNLOAD_TOKEN` environment variable instead of putting the token in `app.json`. |
-
----
-
-## 📦 Environment Variables Summary
-
-Create a `.env.local` file in the monorepo root:
-
-```bash
-# Required for Mapbox examples
-EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.xxxxx
-
-# Required during Mapbox prebuild (secret token, never commit this)
-RNMAPBOX_MAPS_DOWNLOAD_TOKEN=sk.xxxxx
-
-# Required for Google Maps example
-EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSy...
-
-# Optional: Self-hosted Valhalla for MapLibre example
+# ── VALHALLA CONFIGURATION ───────────────────────────────────────────────────
+# Optional self-hosted Valhalla URL. Defaults to OpenStreetMap public instance if empty.
 EXPO_PUBLIC_VALHALLA_URL=http://localhost:8002
 ```
 
 > [!CAUTION]
-> Never commit your Mapbox **secret token** (`sk.*`) to version control. Add `.env.local` to your `.gitignore`.
+> Never commit `.env.local` containing private keys or secret keys to version control. It is already added to `.gitignore`.
+
+---
+
+## 🛠️ Detailed Mobile Variant Setup Guides
+
+### 1. Leaflet (Expo Go — 🟢 Out of the Box)
+Uses Leaflet CDN inside a standard Expo `WebView`.
+- **API Keys**: None required.
+- **Directions Backend**: Casablanca Medina Loop from the public OSRM API.
+- **Run command**:
+  ```bash
+  npx expo start
+  # Scan QR with Expo Go on your mobile or hit 'a' / 'i'
+  ```
+
+### 2. Google Maps (Expo Go — 🟡 Key Required)
+Uses `react-native-maps` to draw native platform mapping.
+- **API Keys**: Requires a Google Maps API Key with **Maps SDK for Android** and **Maps SDK for iOS** enabled in the [Google Cloud Console](https://console.cloud.google.com/).
+- **Setup**:
+  1. Add `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` to `.env.local`.
+  2. Launch via `npx expo start`.
+- **Important**: Your emulator must have **Google Play Services** installed. Use a **Google Play Store** system image in Android Studio.
+
+### 3. Mapbox (Development Build — 🔴 Native Linking)
+Uses the high-performance `@rnmapbox/maps` rendering engine.
+- **API Keys**: Mapbox Public token (`pk.*`) and Secret download token (`sk.*`) are required.
+- **Setup**:
+  1. Register the tokens in your `.env.local`.
+  2. Run `npx expo prebuild` to inject native Gradle hooks.
+  3. Compile and build:
+     ```bash
+     npx expo run:android
+     # or
+     npx expo run:ios
+     ```
+
+### 4. MapLibre (Development Build — 🔴 Native Linking)
+Uses `@maplibre/maplibre-react-native` for a 100% open-source vector map solution.
+- **API Keys**: None required!
+- **Directions Backend**: Uses Valhalla (`ValhallaDirectionsProvider`).
+- **Setup**:
+  1. Run `npx expo prebuild` to configure Android/iOS projects.
+  2. Compile and launch:
+     ```bash
+     npx expo run:android
+     ```
+  3. Optionally spin up a local Valhalla routing container:
+     ```bash
+     docker run -p 8002:8002 ghcr.io/valhalla/valhalla:latest
+     ```
+
+---
+
+## ⚡ Metro Symlinks & Instant Refresh
+
+A standard monorepo structure links packages in node_modules, requiring recompilation on every edit. We bypass this limitation completely.
+The root `metro.config.js` is customized with a custom resolver that redirects `@ingissa/navcore-*` imports directly to their local TypeScript source files:
+
+```javascript
+// metro.config.js excerpt
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName.startsWith('@ingissa/navcore-')) {
+    // Re-route directly to packages/navcore-sdk/packages/[pkg]/src/index.ts
+    return { filePath: resolvedTsPath, type: 'sourceFile' };
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
+```
+This guarantees **instant hot reloading** in the mobile emulator whenever you save a change inside the SDK!
+
+---
+
+## 🐛 Troubleshooting Directory
+
+| Symptom | Probable Cause | Actionable Solution |
+|---------|----------------|---------------------|
+| **Blank map on Google Maps** | Play Services or API key missing | Verify `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` is set and emulator has Google Play Store installed. |
+| **`Unable to resolve module @ingissa/navcore-*`** | Cache stale or config missing | Clean Expo's bundler cache: run `npx expo start --clear`. |
+| **`Mapbox Native Module is not linked`** | Running in standard Expo Go | Expo Go does not contain Mapbox binaries. Compile a custom client using `npx expo run:android`. |
+| **Insufficient storage during prebuild** | Emulator drive full | Wipe emulator data in Android Studio Device Manager under options. |
+| **Valhalla server is unreachable** | Rate limit or server offline | Set `EXPO_PUBLIC_VALHALLA_URL` to point to a local self-hosted Valhalla container. |
+| **TTS/Voice Cues are silent** | Navigation is in standby | Hit the **▶ START** simulation button in the app HUD, and ensure simulator coordinates advance close to a waypoint. |

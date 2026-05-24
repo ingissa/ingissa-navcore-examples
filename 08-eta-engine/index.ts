@@ -14,7 +14,7 @@ import {
   NavCore,
   ETAEngine,
   OSRMDirectionsProvider,
-} from '../../packages/core/src/index';
+} from '@ingissa/navcore-core';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
@@ -50,7 +50,10 @@ async function runSimulation(
   geometry: [number, number][],
   speedFn: (i: number, total: number) => number
 ) {
-  const engine = new NavCore({ isDev: true });
+  const DEV_BYPASS_KEY =
+    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+
+  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
   const eta = new ETAEngine({ speedWindowSize: 5 });
 
   engine.setRoute(geometry);
@@ -97,3 +100,5 @@ async function runSimulation(
 }
 
 main().catch(console.error);
+
+

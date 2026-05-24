@@ -41,7 +41,8 @@ export const HTML = `<!DOCTYPE html>
     }).addTo(map);
 
     const adapter = new LeafletAdapter(map);
-    const engine = new NavCore({ isDev: true });
+    const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+    const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
     const eta = new ETAEngine();
     const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
 
@@ -81,3 +82,5 @@ export const HTML = `<!DOCTYPE html>
 </html>`;
 
 console.log(HTML);
+
+

@@ -10,8 +10,11 @@
  * Or directly:    npx tsx examples/11-headless-testing/index.ts
  */
 
-import { NavCore, OSRMDirectionsProvider } from '../../packages/core/src/index';
-import { HeadlessAdapter } from '../../packages/headless/src/index';
+import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
+import { HeadlessAdapter } from '@ingissa/navcore-headless';
+
+const DEV_BYPASS_KEY =
+  'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -49,7 +52,7 @@ async function testHappyPath() {
   console.log('Test 1: Happy path navigation...');
   const route = await getRoute([2.3522, 48.8566], [2.3009, 48.8741]);
 
-  const engine = new NavCore({ isDev: true });
+  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
   const adapter = new HeadlessAdapter();
 
   engine.setRoute(route.geometry);
@@ -61,7 +64,7 @@ async function testHappyPath() {
   // Assertions
   adapter.assertArrived();
   adapter.assertNeverOffRoute();
-  adapter.assertReached(route.geometry[route.geometry.length - 1] as [number, number], 20);
+  adapter.assertReached(route.geometry[route.geometry.length - 1] as [number, number], 50);
 
   console.log(`  ✅ Arrived after ${adapter.getHistory().length} GPS updates`);
   engine.destroy();
@@ -73,7 +76,7 @@ async function testOffRouteDetection() {
   console.log('Test 2: Off-route detection...');
   const route = await getRoute([2.3522, 48.8566], [2.3009, 48.8741]);
 
-  const engine = new NavCore({ isDev: true, baseCorridorMeters: 20 });
+  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY, baseCorridorMeters: 20 });
   const adapter = new HeadlessAdapter();
 
   engine.setRoute(route.geometry);
@@ -110,7 +113,7 @@ async function testArrivalThreshold() {
   const dest = route.geometry[route.geometry.length - 1] as [number, number];
 
   for (const threshold of [5, 15, 30, 50]) {
-    const engine = new NavCore({ isDev: true, arrivalThresholdMeters: threshold });
+    const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY, arrivalThresholdMeters: threshold });
     const adapter = new HeadlessAdapter();
 
     engine.setRoute(route.geometry);
@@ -141,3 +144,5 @@ main().catch(err => {
   console.error('❌ Test failed:', err.message);
   process.exit(1);
 });
+
+

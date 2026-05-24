@@ -5,7 +5,7 @@
  * Run: npx tsx examples/09-geofencing/index.ts
  */
 
-import { GeofencingEngine } from '../../packages/core/src/index';
+import { GeofencingEngine } from '@ingissa/navcore-core';
 
 function main() {
   const geo = new GeofencingEngine({ dwellThresholdMs: 2000 });
@@ -42,3 +42,5 @@ function main() {
 }
 
 main();
+
+
