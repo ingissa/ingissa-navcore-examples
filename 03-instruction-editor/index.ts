@@ -1,5 +1,5 @@
 /**
- * Example 03 â€” Instruction Editor
+ * Example 03 Ã¢â‚¬â€ Instruction Editor
  *
  * Demonstrates:
  * - Building a NavInstruction array from scratch using InstructionEditor
@@ -33,16 +33,16 @@ async function main() {
   const geometry = route.geometry;
   console.log(`Route: ${geometry.length} points\n`);
 
-  // â”€â”€ Build instructions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Build instructions Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const editor = new InstructionEditor();
 
   editor
     .addDepart(geometry[0]!, 'Head north on Rue de Rivoli')
     .addTurn(
       geometry[Math.floor(geometry.length * 0.25)]!,
-      'Turn left onto Avenue des Champs-Ã‰lysÃ©es',
+      'Turn left onto Avenue des Champs-Ãƒâ€°lysÃƒÂ©es',
       Math.floor(geometry.length * 0.25),
-      { meta: { streetName: 'Avenue des Champs-Ã‰lysÃ©es' } }
+      { meta: { streetName: 'Avenue des Champs-Ãƒâ€°lysÃƒÂ©es' } }
     )
     .addExamPoint(
       geometry[Math.floor(geometry.length * 0.4)]!,
@@ -82,7 +82,7 @@ async function main() {
     }
   });
 
-  // â”€â”€ Use instructions with engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Use instructions with engine Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   console.log('\n=== Running navigation ===\n');
 
   const DEV_BYPASS_KEY =
@@ -94,7 +94,7 @@ async function main() {
 
   engine.on('instruction', (instr: any) => {
     const rich = editor.toRichArray().find(r => r.geometryIndex === instr.geometryIndex);
-    const tag = rich?.type === 'exam_point' ? `âš ï¸  [${rich.severity}]` : 'ðŸ—£ ';
+    const tag = rich?.type === 'exam_point' ? `Ã¢Å¡Â Ã¯Â¸Â  [${rich.severity}]` : 'Ã°Å¸â€”Â£ ';
     console.log(`${tag} ${instr.text}`);
   });
 

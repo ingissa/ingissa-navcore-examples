@@ -3,20 +3,20 @@
 ## Installation
 
 ```bash
-# Core engine â€” required for everything
+# Core engine Ã¢â‚¬â€ required for everything
 npm install @ingissa/navcore-core
 
 # Directions (choose what matches your stack)
 # Option A: Mapbox API (requires token)
 npm install @ingissa/navcore-mapbox
 
-# Option B: Self-hosted / free (built into @ingissa/navcore-core â€” no extra install)
+# Option B: Self-hosted / free (built into @ingissa/navcore-core Ã¢â‚¬â€ no extra install)
 # OSRMDirectionsProvider, ValhallaDirectionsProvider, OpenRouteServiceProvider
 
 # Renderer (choose one)
-npm install @ingissa/navcore-maplibre      # Web â€” MapLibre GL JS
-npm install @ingissa/navcore-leaflet       # Web â€” Leaflet.js
-npm install @ingissa/navcore-google-maps   # Web â€” Google Maps API
+npm install @ingissa/navcore-maplibre      # Web Ã¢â‚¬â€ MapLibre GL JS
+npm install @ingissa/navcore-leaflet       # Web Ã¢â‚¬â€ Leaflet.js
+npm install @ingissa/navcore-google-maps   # Web Ã¢â‚¬â€ Google Maps API
 npm install @ingissa/navcore-headless      # Node.js / testing
 ```
 
@@ -47,7 +47,7 @@ console.log(result.duration, 'seconds');
 import { NavCore } from '@ingissa/navcore-core';
 
 const engine = new NavCore({
-  isDev: true,  // use in development â€” remove in production and add licenseKey
+  isDev: true,  // use in development Ã¢â‚¬â€ remove in production and add licenseKey
 });
 ```
 

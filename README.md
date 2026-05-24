@@ -1,4 +1,4 @@
-# NavCore SDK â€” Examples Hub
+# NavCore SDK Ã¢â‚¬â€ Examples Hub
 
 Welcome to the **NavCore SDK Examples Hub**! This directory contains a comprehensive set of examples designed to demonstrate the versatility of the `@ingissa/navcore-sdk` navigation engine. 
 
@@ -7,30 +7,30 @@ The examples are split into one category:
 
 ---
 
-## ðŸ—ºï¸ Compatibility Matrix
+## Ã°Å¸â€”ÂºÃ¯Â¸Â Compatibility Matrix
 
 ### Standalone Demos (01 - 11)
 
 | Example | Title | Key Features Demonstrated | Network / API Dependency |
 |---------|-------|---------------------------|--------------------------|
-| **01** | Basic Navigation | Standard snapping & route progress updates | âœ… OSRM (free public API) |
-| **02** | Custom Route Builder | `CustomRouteBuilder`, GPX, and GeoJSON export | âœ… OSRM (free public API) |
-| **03** | Instruction Editor | `InstructionEditor` fluent custom turn additions | âœ… OSRM (free public API) |
-| **04** | MapLibre Web | HTML generation + `MapLibreAdapter` browser camera | âœ… OSRM (free public API) |
-| **05** | Leaflet Web | HTML generation + `LeafletAdapter` browser tiles | âœ… OSRM (free public API) |
-| **06** | Directions Providers | Comparative OSRM vs. Valhalla vs. OpenRouteService | âœ… All three providers |
-| **07** | Voice Triggers | Standalone `VoiceTriggerEngine` priority vocal queues | âœ… OSRM (free public API) |
-| **08** | ETA Engine | Standalone `ETAEngine` rolling average speed metrics | âœ… OSRM (free public API) |
-| **09** | Geofencing | Standalone offline `GeofencingEngine` zones | âŒ None (100% Offline) |
-| **10** | Parallel Road Snapping | `ParallelRoadResolver` U-turn scoring and protection | âŒ None (100% Offline) |
-| **11** | Headless Testing | CI/CD testing pipeline with programmatic mocks | âœ… OSRM (free public API) |
+| **01** | Basic Navigation | Standard snapping & route progress updates | Ã¢Å“â€¦ OSRM (free public API) |
+| **02** | Custom Route Builder | `CustomRouteBuilder`, GPX, and GeoJSON export | Ã¢Å“â€¦ OSRM (free public API) |
+| **03** | Instruction Editor | `InstructionEditor` fluent custom turn additions | Ã¢Å“â€¦ OSRM (free public API) |
+| **04** | MapLibre Web | HTML generation + `MapLibreAdapter` browser camera | Ã¢Å“â€¦ OSRM (free public API) |
+| **05** | Leaflet Web | HTML generation + `LeafletAdapter` browser tiles | Ã¢Å“â€¦ OSRM (free public API) |
+| **06** | Directions Providers | Comparative OSRM vs. Valhalla vs. OpenRouteService | Ã¢Å“â€¦ All three providers |
+| **07** | Voice Triggers | Standalone `VoiceTriggerEngine` priority vocal queues | Ã¢Å“â€¦ OSRM (free public API) |
+| **08** | ETA Engine | Standalone `ETAEngine` rolling average speed metrics | Ã¢Å“â€¦ OSRM (free public API) |
+| **09** | Geofencing | Standalone offline `GeofencingEngine` zones | Ã¢ÂÅ’ None (100% Offline) |
+| **10** | Parallel Road Snapping | `ParallelRoadResolver` U-turn scoring and protection | Ã¢ÂÅ’ None (100% Offline) |
+| **11** | Headless Testing | CI/CD testing pipeline with programmatic mocks | Ã¢Å“â€¦ OSRM (free public API) |
 
 
 > \* Google Maps renders tiles in Expo Go only if Google Play Services is available on the emulator or device **and** a valid Maps API key is configured.
 
 ---
 
-## ðŸ—ï¸ Architecture & Data Flow
+## Ã°Å¸Ââ€”Ã¯Â¸Â Architecture & Data Flow
 
 Below is the standard premium pipeline utilized across both the headless test frameworks and the React Native screens. A synthetic or live GPS signal is smoothed, snapped to a route, and fed into individual Pro engines to generate state variables:
 
@@ -48,7 +48,7 @@ graph TD
 
 ---
 
-## ðŸš€ Installation & Prerequisites
+## Ã°Å¸Å¡â‚¬ Installation & Prerequisites
 
 From the monorepo root directory, install all required dependencies (peer dependencies are handled via the legacy flag for mobile modules):
 
@@ -59,27 +59,27 @@ npm install --legacy-peer-deps
 
 ---
 
-## ðŸ’» Running Standalone Examples (01 - 11)
+## Ã°Å¸â€™Â» Running Standalone Examples (01 - 11)
 
 All standalone Node examples use direct TypeScript execution. Run them with `npx tsx`:
 
 ```bash
 # Run basic snapping output
-npx tsx examples/01-basic-navigation/index.ts
+npx tsx 01-basic-navigation/index.ts
 
 # Export custom routes to GPX
-npx tsx examples/02-custom-route-builder/index.ts
+npx tsx 02-custom-route-builder/index.ts
 
 # Test fluent instruction builder
-npx tsx examples/03-instruction-editor/index.ts
+npx tsx 03-instruction-editor/index.ts
 
 # Generate static HTML visualizers
-npx tsx examples/04-maplibre-web/index.ts > public/maplibre.html
-npx tsx examples/05-leaflet-web/index.ts  > public/leaflet.html
+npx tsx 04-maplibre-web/index.ts > public/maplibre.html
+npx tsx 05-leaflet-web/index.ts  > public/leaflet.html
 
 # Run offline engines
-npx tsx examples/09-geofencing/index.ts
-npx tsx examples/10-parallel-road-resolver/index.ts
+npx tsx 09-geofencing/index.ts
+npx tsx 10-parallel-road-resolver/index.ts
 ```
 
 ---
@@ -87,7 +87,7 @@ npx tsx examples/10-parallel-road-resolver/index.ts
 
 ---
 
-## âš¡ Metro Symlinks & Instant Refresh
+## Ã¢Å¡Â¡ Metro Symlinks & Instant Refresh
 
 A standard monorepo structure links packages in node_modules, requiring recompilation on every edit. We bypass this limitation completely.
 The root `metro.config.js` is customized with a custom resolver that redirects `@ingissa/navcore-*` imports directly to their local TypeScript source files:
@@ -106,7 +106,7 @@ This guarantees **instant hot reloading** in the mobile emulator whenever you sa
 
 ---
 
-## ðŸ› Troubleshooting Directory
+## Ã°Å¸Ââ€º Troubleshooting Directory
 
 | Symptom | Probable Cause | Actionable Solution |
 |---------|----------------|---------------------|
@@ -115,4 +115,4 @@ This guarantees **instant hot reloading** in the mobile emulator whenever you sa
 | **`Mapbox Native Module is not linked`** | Running in standard Expo Go | Expo Go does not contain Mapbox binaries. Compile a custom client using `npx expo run:android`. |
 | **Insufficient storage during prebuild** | Emulator drive full | Wipe emulator data in Android Studio Device Manager under options. |
 | **Valhalla server is unreachable** | Rate limit or server offline | Set `EXPO_PUBLIC_VALHALLA_URL` to point to a local self-hosted Valhalla container. |
-| **TTS/Voice Cues are silent** | Navigation is in standby | Hit the **â–¶ START** simulation button in the app HUD, and ensure simulator coordinates advance close to a waypoint. |
+| **TTS/Voice Cues are silent** | Navigation is in standby | Hit the **Ã¢â€“Â¶ START** simulation button in the app HUD, and ensure simulator coordinates advance close to a waypoint. |

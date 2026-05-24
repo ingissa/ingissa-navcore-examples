@@ -1,9 +1,9 @@
 /**
- * Example 05 â€” Leaflet Web
+ * Example 05 Ã¢â‚¬â€ Leaflet Web
  *
  * Full browser navigation page using Leaflet.js + NavCore.
  * Paste this HTML into index.html and open in a browser.
- * No API key required â€” uses OSM tiles + OSRM routing.
+ * No API key required Ã¢â‚¬â€ uses OSM tiles + OSRM routing.
  */
 
 export const HTML = `<!DOCTYPE html>
@@ -26,9 +26,9 @@ export const HTML = `<!DOCTYPE html>
 <body>
   <div id="map"></div>
   <div id="hud">
-    <div>ðŸš— <b id="speed">0</b> km/h</div>
-    <div>ðŸ“ <b id="dist">â€”</b></div>
-    <div>ðŸ <b id="status">Waiting for GPS...</b></div>
+    <div>Ã°Å¸Å¡â€” <b id="speed">0</b> km/h</div>
+    <div>Ã°Å¸â€œÂ <b id="dist">Ã¢â‚¬â€</b></div>
+    <div>Ã°Å¸ÂÂ <b id="status">Waiting for GPS...</b></div>
   </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script type="module">
@@ -37,7 +37,7 @@ export const HTML = `<!DOCTYPE html>
 
     const map = L.map('map').setView([48.86, 2.35], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Â© OpenStreetMap'
+      attribution: 'Ã‚Â© OpenStreetMap'
     }).addTo(map);
 
     const adapter = new LeafletAdapter(map);
@@ -71,9 +71,9 @@ export const HTML = `<!DOCTYPE html>
       const etaResult = eta.update(state);
       document.getElementById('speed').textContent = (state.currentSpeed * 3.6).toFixed(0);
       document.getElementById('dist').textContent = etaResult.isReliable
-        ? (etaResult.distanceRemainingM / 1000).toFixed(1) + ' km Â· ' + Math.ceil(etaResult.etaSeconds / 60) + ' min'
-        : state.distanceToDestination ? (state.distanceToDestination / 1000).toFixed(1) + ' km' : 'â€”';
-      if (state.hasArrived) document.getElementById('status').textContent = 'ðŸ Arrived!';
+        ? (etaResult.distanceRemainingM / 1000).toFixed(1) + ' km Ã‚Â· ' + Math.ceil(etaResult.etaSeconds / 60) + ' min'
+        : state.distanceToDestination ? (state.distanceToDestination / 1000).toFixed(1) + ' km' : 'Ã¢â‚¬â€';
+      if (state.hasArrived) document.getElementById('status').textContent = 'Ã°Å¸ÂÂ Arrived!';
     }, console.error, { enableHighAccuracy: true });
 
     init();

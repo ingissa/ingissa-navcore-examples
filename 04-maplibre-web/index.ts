@@ -1,5 +1,5 @@
 /**
- * Example 04 â€” MapLibre Web
+ * Example 04 Ã¢â‚¬â€ MapLibre Web
  *
  * A full browser navigation page using MapLibre GL JS + NavCore.
  * Paste this HTML into a file and open in a browser.
@@ -42,10 +42,10 @@ export const HTML = `<!DOCTYPE html>
 <body>
   <div id="map"></div>
   <div id="hud">
-    <h3>ðŸ§­ NavCore</h3>
-    <p>Speed: <span id="speed">â€”</span></p>
-    <p>Distance: <span id="dist">â€”</span></p>
-    <p>ETA: <span id="eta">â€”</span></p>
+    <h3>Ã°Å¸Â§Â­ NavCore</h3>
+    <p>Speed: <span id="speed">Ã¢â‚¬â€</span></p>
+    <p>Distance: <span id="dist">Ã¢â‚¬â€</span></p>
+    <p>ETA: <span id="eta">Ã¢â‚¬â€</span></p>
     <p>Status: <span id="status">Loading...</span></p>
   </div>
   <div id="instruction"></div>
@@ -95,7 +95,7 @@ export const HTML = `<!DOCTYPE html>
       });
 
       engine.on('arrival', () => {
-        document.getElementById('status').textContent = 'ðŸ Arrived!';
+        document.getElementById('status').textContent = 'Ã°Å¸ÂÂ Arrived!';
       });
     }
 
@@ -120,10 +120,10 @@ export const HTML = `<!DOCTYPE html>
       document.getElementById('speed').textContent = (state.currentSpeed * 3.6).toFixed(0) + ' km/h';
       document.getElementById('dist').textContent = state.distanceToDestination
         ? (state.distanceToDestination / 1000).toFixed(1) + ' km'
-        : 'â€”';
+        : 'Ã¢â‚¬â€';
       document.getElementById('eta').textContent = etaResult.isReliable
         ? Math.ceil(etaResult.etaSeconds / 60) + ' min'
-        : 'â€”';
+        : 'Ã¢â‚¬â€';
     }, console.error, { enableHighAccuracy: true });
 
     init();

@@ -6,44 +6,44 @@ Every call to `engine.update(gps)` runs this pipeline in order:
 
 ```
 GPS Input
-   â”‚
-   â–¼
+   Ã¢â€â€š
+   Ã¢â€“Â¼
 1. Kalman Filter (noise smoothing)
-   â”‚  KalmanFilter2D â€” smooths noisy GPS coordinates using Q/R noise matrices
-   â–¼
+   Ã¢â€â€š  KalmanFilter2D Ã¢â‚¬â€ smooths noisy GPS coordinates using Q/R noise matrices
+   Ã¢â€“Â¼
 2. Route Snapper (map matching)
-   â”‚  RouteSnapper â€” projects filtered coord onto nearest route segment
-   â”‚  â†³ Bearing penalty â†’ U-turn protection (FEATURE: U_TURN_PROTECTION)
-   â”‚  â†³ Inertia penalty â†’ anti-oscillation between segments
-   â–¼
+   Ã¢â€â€š  RouteSnapper Ã¢â‚¬â€ projects filtered coord onto nearest route segment
+   Ã¢â€â€š  Ã¢â€ Â³ Bearing penalty Ã¢â€ â€™ U-turn protection (FEATURE: U_TURN_PROTECTION)
+   Ã¢â€â€š  Ã¢â€ Â³ Inertia penalty Ã¢â€ â€™ anti-oscillation between segments
+   Ã¢â€“Â¼
 3. Dynamic Corridor (tolerance zone)
-   â”‚  calculateDynamicCorridor â€” widens corridor at high speed / low accuracy
-   â–¼
+   Ã¢â€â€š  calculateDynamicCorridor Ã¢â‚¬â€ widens corridor at high speed / low accuracy
+   Ã¢â€“Â¼
 4. Progress Validation (monotonic advance)
-   â”‚  validateProgressUpdate â€” rejects backwards jumps > MAX_SNAP_DISTANCE
-   â–¼
+   Ã¢â€â€š  validateProgressUpdate Ã¢â‚¬â€ rejects backwards jumps > MAX_SNAP_DISTANCE
+   Ã¢â€“Â¼
 5. Linear Offset Update (dead reckoning prep)
-   â”‚  applyGpsCorrection â€” blends measured route offset with predicted offset
-   â–¼
+   Ã¢â€â€š  applyGpsCorrection Ã¢â‚¬â€ blends measured route offset with predicted offset
+   Ã¢â€“Â¼
 6. Bearing Smoothing (if ADVANCED_BEARING licensed)
-   â”‚  applyBearingSmoothing â€” blends GPS bearing + route-derived bearing
-   â–¼
+   Ã¢â€â€š  applyBearingSmoothing Ã¢â‚¬â€ blends GPS bearing + route-derived bearing
+   Ã¢â€“Â¼
 7. Deviation Detection (off-route FSM)
-   â”‚  DeviationDetector â†’ OffRouteFSM transitions:
-   â”‚  ON_ROUTE â†’ DEVIATING â†’ OFF_ROUTE â†’ REJOINING
-   â–¼
+   Ã¢â€â€š  DeviationDetector Ã¢â€ â€™ OffRouteFSM transitions:
+   Ã¢â€â€š  ON_ROUTE Ã¢â€ â€™ DEVIATING Ã¢â€ â€™ OFF_ROUTE Ã¢â€ â€™ REJOINING
+   Ã¢â€“Â¼
 8. Lifecycle Join Detection
-   â”‚  NavigationFSM: APPROACHING_ROUTE â†’ NAVIGATING
-   â–¼
+   Ã¢â€â€š  NavigationFSM: APPROACHING_ROUTE Ã¢â€ â€™ NAVIGATING
+   Ã¢â€“Â¼
 9. Instruction Resolution (speed-adaptive trigger)
-   â”‚  resolveNextInstruction â€” fires when within trigger window of next maneuver
-   â–¼
+   Ã¢â€â€š  resolveNextInstruction Ã¢â‚¬â€ fires when within trigger window of next maneuver
+   Ã¢â€“Â¼
 10. Arrival Detection
-    â”‚  haversineDistance to destination < arrivalThresholdMeters
-    â–¼
+    Ã¢â€â€š  haversineDistance to destination < arrivalThresholdMeters
+    Ã¢â€“Â¼
 11. Dead Reckoning anchor update (if DEAD_RECKONING licensed)
-    â”‚  DeadReckoningEngine â€” predicts position between GPS updates
-    â–¼
+    Ã¢â€â€š  DeadReckoningEngine Ã¢â‚¬â€ predicts position between GPS updates
+    Ã¢â€“Â¼
 NavCoreState (snapshot of all state)
 ```
 
@@ -53,75 +53,75 @@ NavCoreState (snapshot of all state)
 
 ```
 @ingissa/navcore-core/src/
-â”œâ”€â”€ NavCore.ts               â† Main orchestrator (the 11 stages above)
-â”œâ”€â”€ features.ts              â† Feature flag constants
-â”œâ”€â”€ constants.ts             â† Tunable thresholds
-â”‚
-â”œâ”€â”€ geo/
-â”‚   â”œâ”€â”€ haversine.ts         â† Distance, bearing, destination point
-â”‚   â”œâ”€â”€ bearing.ts           â† Angle normalization, interpolation
-â”‚   â”œâ”€â”€ projection.ts        â† Point-on-segment projection
-â”‚   â””â”€â”€ cumulative.ts        â† Cumulative distance arrays (forward + reverse)
-â”‚
-â”œâ”€â”€ kalman/
-â”‚   â””â”€â”€ KalmanFilter2D.ts    â† 2D Kalman filter for GPS smoothing
-â”‚
-â”œâ”€â”€ snapper/
-â”‚   â”œâ”€â”€ RouteSnapper.ts      â† Stage 2 â€” map matching with penalties
-â”‚   â””â”€â”€ ParallelRoadResolver.ts â† Standalone parallel road / U-turn API [P0]
-â”‚
-â”œâ”€â”€ corridor/
-â”‚   â”œâ”€â”€ DynamicCorridor.ts   â† Stage 3 â€” speed/accuracy-adaptive width
-â”‚   â””â”€â”€ DeviationDetector.ts â† Stage 7 â€” compound deviation signals
-â”‚
-â”œâ”€â”€ bearing/
-â”‚   â””â”€â”€ BearingEngine.ts     â† Stage 6 â€” smoothing, blending, speed-adaptive Î±
-â”‚
-â”œâ”€â”€ progress/
-â”‚   â”œâ”€â”€ ProgressTracker.ts   â† Stage 4 â€” monotonic index validation
-â”‚   â”œâ”€â”€ InstructionResolver.ts â† Stage 9 â€” proximity + bearing gate trigger
-â”‚   â””â”€â”€ InstructionEditor.ts â† Fluent instruction builder [P0]
-â”‚
-â”œâ”€â”€ predictor/
-â”‚   â””â”€â”€ RouteOffsetPredictor.ts â† Stage 5 â€” linear offset advance + GPS correction
-â”‚
-â”œâ”€â”€ dead-reckoning/
-â”‚   â””â”€â”€ DeadReckoning.ts     â† Stage 11 â€” dead reckoning between GPS fixes
-â”‚
-â”œâ”€â”€ off-route/
-â”‚   â”œâ”€â”€ NavigationFSM.ts     â† Lifecycle FSM (IDLE â†’ NAVIGATING â†’ FINISHED)
-â”‚   â””â”€â”€ OffRouteFSM.ts       â† Off-route FSM (ON_ROUTE â†’ DEVIATING â†’ OFF_ROUTE)
-â”‚
-â”œâ”€â”€ route-builder/
-â”‚   â””â”€â”€ CustomRouteBuilder.ts â† Waypoint management, GPX/GeoJSON import/export
-â”‚
-â”œâ”€â”€ directions/
-â”‚   â”œâ”€â”€ DirectionsProvider.ts    â† Generic interface [P2]
-â”‚   â”œâ”€â”€ OSRMDirectionsProvider.ts â† Self-hosted OSRM [P2]
-â”‚   â”œâ”€â”€ ValhallaDirectionsProvider.ts â† Self-hosted Valhalla [P2]
-â”‚   â””â”€â”€ OpenRouteServiceProvider.ts â† ORS API [P2]
-â”‚
-â”œâ”€â”€ renderer/
-â”‚   â””â”€â”€ MapRendererAdapter.ts â† Generic renderer interface [P1]
-â”‚
-â”œâ”€â”€ voice/
-â”‚   â””â”€â”€ VoiceTriggerEngine.ts â† TTS timing + deduplication [P3]
-â”‚
-â”œâ”€â”€ eta/
-â”‚   â””â”€â”€ ETAEngine.ts          â† Offline ETA computation [P3]
-â”‚
-â”œâ”€â”€ geofencing/
-â”‚   â””â”€â”€ GeofencingEngine.ts   â† Circle + polygon zones [P3]
-â”‚
-â””â”€â”€ license/
-    â””â”€â”€ LicenseManager.ts     â† Feature flag validation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NavCore.ts               Ã¢â€ Â Main orchestrator (the 11 stages above)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ features.ts              Ã¢â€ Â Feature flag constants
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ constants.ts             Ã¢â€ Â Tunable thresholds
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ geo/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ haversine.ts         Ã¢â€ Â Distance, bearing, destination point
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ bearing.ts           Ã¢â€ Â Angle normalization, interpolation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ projection.ts        Ã¢â€ Â Point-on-segment projection
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ cumulative.ts        Ã¢â€ Â Cumulative distance arrays (forward + reverse)
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ kalman/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ KalmanFilter2D.ts    Ã¢â€ Â 2D Kalman filter for GPS smoothing
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ snapper/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ RouteSnapper.ts      Ã¢â€ Â Stage 2 Ã¢â‚¬â€ map matching with penalties
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ParallelRoadResolver.ts Ã¢â€ Â Standalone parallel road / U-turn API [P0]
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ corridor/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DynamicCorridor.ts   Ã¢â€ Â Stage 3 Ã¢â‚¬â€ speed/accuracy-adaptive width
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ DeviationDetector.ts Ã¢â€ Â Stage 7 Ã¢â‚¬â€ compound deviation signals
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ bearing/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ BearingEngine.ts     Ã¢â€ Â Stage 6 Ã¢â‚¬â€ smoothing, blending, speed-adaptive ÃŽÂ±
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ progress/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ProgressTracker.ts   Ã¢â€ Â Stage 4 Ã¢â‚¬â€ monotonic index validation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ InstructionResolver.ts Ã¢â€ Â Stage 9 Ã¢â‚¬â€ proximity + bearing gate trigger
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ InstructionEditor.ts Ã¢â€ Â Fluent instruction builder [P0]
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ predictor/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ RouteOffsetPredictor.ts Ã¢â€ Â Stage 5 Ã¢â‚¬â€ linear offset advance + GPS correction
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ dead-reckoning/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ DeadReckoning.ts     Ã¢â€ Â Stage 11 Ã¢â‚¬â€ dead reckoning between GPS fixes
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ off-route/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NavigationFSM.ts     Ã¢â€ Â Lifecycle FSM (IDLE Ã¢â€ â€™ NAVIGATING Ã¢â€ â€™ FINISHED)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ OffRouteFSM.ts       Ã¢â€ Â Off-route FSM (ON_ROUTE Ã¢â€ â€™ DEVIATING Ã¢â€ â€™ OFF_ROUTE)
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ route-builder/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CustomRouteBuilder.ts Ã¢â€ Â Waypoint management, GPX/GeoJSON import/export
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ directions/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DirectionsProvider.ts    Ã¢â€ Â Generic interface [P2]
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ OSRMDirectionsProvider.ts Ã¢â€ Â Self-hosted OSRM [P2]
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ValhallaDirectionsProvider.ts Ã¢â€ Â Self-hosted Valhalla [P2]
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ OpenRouteServiceProvider.ts Ã¢â€ Â ORS API [P2]
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ renderer/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ MapRendererAdapter.ts Ã¢â€ Â Generic renderer interface [P1]
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ voice/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ VoiceTriggerEngine.ts Ã¢â€ Â TTS timing + deduplication [P3]
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ eta/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ETAEngine.ts          Ã¢â€ Â Offline ETA computation [P3]
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ geofencing/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ GeofencingEngine.ts   Ã¢â€ Â Circle + polygon zones [P3]
+Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ license/
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ LicenseManager.ts     Ã¢â€ Â Feature flag validation
 
-@ingissa/navcore-headless/   â† Renderer: in-memory, CI/testing
-@ingissa/navcore-maplibre/   â† Renderer: MapLibre GL JS
-@ingissa/navcore-leaflet/    â† Renderer: Leaflet.js
-@ingissa/navcore-google-maps/ â† Renderer: Google Maps JS API
-@ingissa/navcore-mapbox/     â† Directions: Mapbox Directions API
-@ingissa/navcore-simulator/  â† GPS simulation engine for testing
+@ingissa/navcore-headless/   Ã¢â€ Â Renderer: in-memory, CI/testing
+@ingissa/navcore-maplibre/   Ã¢â€ Â Renderer: MapLibre GL JS
+@ingissa/navcore-leaflet/    Ã¢â€ Â Renderer: Leaflet.js
+@ingissa/navcore-google-maps/ Ã¢â€ Â Renderer: Google Maps JS API
+@ingissa/navcore-mapbox/     Ã¢â€ Â Directions: Mapbox Directions API
+@ingissa/navcore-simulator/  Ã¢â€ Â GPS simulation engine for testing
 ```
 
 ---
@@ -131,25 +131,25 @@ NavCoreState (snapshot of all state)
 ### Lifecycle FSM (`NavigationFSM`)
 
 ```
-IDLE â”€â”€ROUTE_LOADEDâ”€â”€â–º ROUTE_LOADED â”€â”€USER_STARTâ”€â”€â–º APPROACHING_ROUTE
-                                                          â”‚
+IDLE Ã¢â€â‚¬Ã¢â€â‚¬ROUTE_LOADEDÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº ROUTE_LOADED Ã¢â€â‚¬Ã¢â€â‚¬USER_STARTÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº APPROACHING_ROUTE
+                                                          Ã¢â€â€š
                                                    ROUTE_JOINED
-                                                          â”‚
-                                                          â–¼
-                                                    NAVIGATING â”€â”€NAVIGATION_FINISHEDâ”€â”€â–º FINISHED
-                                                          â”‚
+                                                          Ã¢â€â€š
+                                                          Ã¢â€“Â¼
+                                                    NAVIGATING Ã¢â€â‚¬Ã¢â€â‚¬NAVIGATION_FINISHEDÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº FINISHED
+                                                          Ã¢â€â€š
                                                    GPS_LOST / RECOVERED
 ```
 
 ### Off-Route FSM (`OffRouteFSM`)
 
 ```
-ON_ROUTE â”€â”€DEVIATION_SUSPECTEDâ”€â”€â–º DEVIATING â”€â”€DEVIATION_CONFIRMEDâ”€â”€â–º OFF_ROUTE
-    â–²                                  â”‚                                  â”‚
-    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€RESUMEâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜             REROUTE_STARTED      â”‚
-                                                          â”‚               â”‚
-                                                          â–¼               â”‚
-                                                    REJOINING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+ON_ROUTE Ã¢â€â‚¬Ã¢â€â‚¬DEVIATION_SUSPECTEDÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº DEVIATING Ã¢â€â‚¬Ã¢â€â‚¬DEVIATION_CONFIRMEDÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº OFF_ROUTE
+    Ã¢â€“Â²                                  Ã¢â€â€š                                  Ã¢â€â€š
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬RESUMEÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ             REROUTE_STARTED      Ã¢â€â€š
+                                                          Ã¢â€â€š               Ã¢â€â€š
+                                                          Ã¢â€“Â¼               Ã¢â€â€š
+                                                    REJOINING Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ---
@@ -163,7 +163,7 @@ Located in `core/src/constants.ts`. Override via `NavCoreOptions`:
 | `BASE_CORRIDOR_METERS` | 25m | Off-route detection radius at slow speed |
 | `MAX_CORRIDOR_METERS` | 80m | Max corridor at high speed / low accuracy |
 | `ARRIVAL_THRESHOLD_METERS` | 15m | Distance to destination that triggers arrival |
-| `BEARING_MISMATCH_THRESHOLD` | 60Â° | Bearing delta that triggers U-turn penalty |
+| `BEARING_MISMATCH_THRESHOLD` | 60Ã‚Â° | Bearing delta that triggers U-turn penalty |
 | `BEARING_MISMATCH_PENALTY` | 80m | Score penalty added for U-turn mismatch |
 | `MAX_SNAP_DISTANCE` | 150m | Hard cutoff for snapping |
 | `SNAP_WINDOW_SIZE` | 20 | Number of route segments to search ahead |

@@ -1,6 +1,6 @@
 # API Reference
 
-## `NavCore` â€” Main Engine
+## `NavCore` Ã¢â‚¬â€ Main Engine
 
 ### Constructor Options (`NavCoreOptions`)
 
@@ -21,7 +21,7 @@
 ```typescript
 engine.setRoute(route: Coordinate[], instructions?: NavInstruction[]): void
 engine.startNavigation(): void
-engine.update(gps: NavGpsUpdate): NavCoreState   // main tick â€” runs all 11 stages
+engine.update(gps: NavGpsUpdate): NavCoreState   // main tick Ã¢â‚¬â€ runs all 11 stages
 engine.tick(nowMs: number): NavCoreState           // dead-reckoning advance (call at RAF)
 engine.getState(): NavCoreState
 engine.destroy(): void
@@ -34,9 +34,9 @@ engine.off(event, handler): void
 | Event | Payload | When |
 |---|---|---|
 | `routeLoaded` | `{ routeLength }` | `setRoute()` called |
-| `navigationStarted` | â€” | `startNavigation()` called |
+| `navigationStarted` | Ã¢â‚¬â€ | `startNavigation()` called |
 | `instruction` | `NavInstruction` | Instruction enters trigger window |
-| `arrival` | â€” | Destination reached |
+| `arrival` | Ã¢â‚¬â€ | Destination reached |
 | `deviation` | `{ anchorIndex, ghostCoord }` | Off-route confirmed |
 
 ### `NavGpsUpdate`
@@ -80,17 +80,17 @@ interface NavCoreState {
 
 ```typescript
 const builder = new CustomRouteBuilder();
-builder.addWaypoint([lng, lat], { name?: string, silent?: boolean })  // â†’ id
-builder.insertWaypoint(coord, afterId)   // â†’ id
+builder.addWaypoint([lng, lat], { name?: string, silent?: boolean })  // Ã¢â€ â€™ id
+builder.insertWaypoint(coord, afterId)   // Ã¢â€ â€™ id
 builder.removeWaypoint(id)
 builder.moveWaypoint(id, newCoord)
-builder.getWaypoints()                   // â†’ ReadonlyArray<CustomWaypoint>
-builder.chunk('OVERLAP_1', 25)           // â†’ Coordinate[][]
-builder.buildStraightLine()              // â†’ { geometry, waypoints }
+builder.getWaypoints()                   // Ã¢â€ â€™ ReadonlyArray<CustomWaypoint>
+builder.chunk('OVERLAP_1', 25)           // Ã¢â€ â€™ Coordinate[][]
+builder.buildStraightLine()              // Ã¢â€ â€™ { geometry, waypoints }
 builder.fromGPX(gpxString)
-builder.toGPX()                          // â†’ string
+builder.toGPX()                          // Ã¢â€ â€™ string
 builder.fromGeoJSON(geojson)
-builder.toGeoJSON()                      // â†’ FeatureCollection
+builder.toGeoJSON()                      // Ã¢â€ â€™ FeatureCollection
 builder.clear()
 builder.size                             // number
 ```
@@ -110,8 +110,8 @@ editor.update(id, patch)
 editor.remove(id)
 editor.sort()
 editor.attachToCumulative(route)   // auto-compute cumulativeOffset + bearings
-editor.toArray()                   // â†’ NavInstruction[] (use with setRoute)
-editor.toRichArray()               // â†’ RichInstruction[] (with type/severity/meta)
+editor.toArray()                   // Ã¢â€ â€™ NavInstruction[] (use with setRoute)
+editor.toRichArray()               // Ã¢â€ â€™ RichInstruction[] (with type/severity/meta)
 editor.size                        // number
 ```
 
@@ -161,8 +161,8 @@ interface MapRendererAdapter {
 | Adapter | Package | Peer dep |
 |---|---|---|
 | `HeadlessAdapter` | `@ingissa/navcore-headless` | none |
-| `MapLibreAdapter` | `@ingissa/navcore-maplibre` | maplibre-gl â‰¥3 |
-| `LeafletAdapter` | `@ingissa/navcore-leaflet` | leaflet â‰¥1.9 |
+| `MapLibreAdapter` | `@ingissa/navcore-maplibre` | maplibre-gl Ã¢â€°Â¥3 |
+| `LeafletAdapter` | `@ingissa/navcore-leaflet` | leaflet Ã¢â€°Â¥1.9 |
 | `GoogleMapsAdapter` | `@ingissa/navcore-google-maps` | @types/google.maps |
 
 ---
@@ -172,8 +172,8 @@ interface MapRendererAdapter {
 ```typescript
 const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 120 });
 voice.setInstructions(instructions)
-const cue = voice.update(state)     // â†’ VoiceCue | null
-voice.onInstruction(instr, state)   // â†’ VoiceCue (direct)
+const cue = voice.update(state)     // Ã¢â€ â€™ VoiceCue | null
+voice.onInstruction(instr, state)   // Ã¢â€ â€™ VoiceCue (direct)
 voice.reset()
 
 interface VoiceCue {
@@ -220,7 +220,7 @@ interface GeofencingOptions {
 ### Methods
 
 ```typescript
-// Registration â€” name is the human-readable label shown in events
+// Registration Ã¢â‚¬â€ name is the human-readable label shown in events
 geo.addCircle(id: string, name: string, center: Coordinate, radiusM: number, meta?: unknown): string
 geo.addPolygon(id: string, name: string, coords: Coordinate[], meta?: unknown): string
 geo.remove(id: string): void
@@ -228,8 +228,8 @@ geo.clear(): void
 geo.listIds(): string[]
 
 // Runtime
-const events = geo.update(coord: Coordinate)       // â†’ GeofenceEvent[]
-geo.isInside(id: string, coord: Coordinate)        // â†’ boolean
+const events = geo.update(coord: Coordinate)       // Ã¢â€ â€™ GeofenceEvent[]
+geo.isInside(id: string, coord: Coordinate)        // Ã¢â€ â€™ boolean
 ```
 
 ### `GeofenceEvent`
@@ -277,13 +277,13 @@ const uturn = resolver.isLikelyUTurn(bearing, segA, segB);
 
 ---
 
-## `HeadlessAdapter` â€” Test Assertions
+## `HeadlessAdapter` Ã¢â‚¬â€ Test Assertions
 
 ```typescript
 const adapter = new HeadlessAdapter();
 adapter.assertReached([lng, lat], 30)   // throws if not reached within 30m
 adapter.assertArrived()                  // throws if hasArrived never true
 adapter.assertNeverOffRoute()            // throws if ever off-route
-adapter.getHistory()                     // â†’ PositionRecord[]
+adapter.getHistory()                     // Ã¢â€ â€™ PositionRecord[]
 adapter.reset()
 ```

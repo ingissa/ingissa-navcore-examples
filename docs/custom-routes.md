@@ -2,7 +2,7 @@
 
 ## `CustomRouteBuilder`
 
-Build routes from scratch â€” no map click required.
+Build routes from scratch Ã¢â‚¬â€ no map click required.
 
 ```typescript
 import { CustomRouteBuilder } from '@ingissa/navcore-core';
@@ -51,10 +51,10 @@ importedBuilder.fromGPX(gpxString);
 ### GeoJSON Import/Export
 
 ```typescript
-// Export â€” returns a FeatureCollection with Point features + LineString
+// Export Ã¢â‚¬â€ returns a FeatureCollection with Point features + LineString
 const geojson = builder.toGeoJSON();
 
-// Import â€” reads Point features from FeatureCollection
+// Import Ã¢â‚¬â€ reads Point features from FeatureCollection
 const geoBuilder = new CustomRouteBuilder();
 geoBuilder.fromGeoJSON(existingGeoJSON);
 ```
@@ -124,7 +124,7 @@ editor.reorder(id, 2); // Move to position 2
 ### Silent Checkpoints for Exam Tracking
 
 ```typescript
-// Checkpoints don't trigger voice â€” only progress tracking
+// Checkpoints don't trigger voice Ã¢â‚¬â€ only progress tracking
 editor.addCheckpoint(geometry[30], 30, { zone: 'urban', examPhase: 1 });
 editor.addCheckpoint(geometry[60], 60, { zone: 'highway', examPhase: 2 });
 
