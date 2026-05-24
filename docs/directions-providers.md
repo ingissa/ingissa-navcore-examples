@@ -148,6 +148,6 @@ engine.setRoute(geometry);
 | **Free tier** | 100k req/mo | Unlimited (self-host) | Unlimited (self-host) | 2000 req/day |
 | **API key** | Required | No | Optional | Required |
 | **Self-host** | No | Yes (Docker) | Yes (Docker) | Yes |
-| **Traffic** | ✅ (driving-traffic) | ❌ | ✅ (with data) | ❌ |
+| **Traffic** | âœ… (driving-traffic) | âŒ | âœ… (with data) | âŒ |
 | **Profiles** | 4 | 3 | 5 | 8 |
-| **Turn instructions** | ✅ | ✅ | ✅ | ✅ |
+| **Turn instructions** | âœ… | âœ… | âœ… | âœ… |

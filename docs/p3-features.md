@@ -1,4 +1,4 @@
-# P3 Features — Value-Add Modules
+# P3 Features â€” Value-Add Modules
 
 These modules are pure TypeScript, zero dependencies, and work everywhere NavCore runs.
 
@@ -6,19 +6,19 @@ These modules are pure TypeScript, zero dependencies, and work everywhere NavCor
 
 ## VoiceTriggerEngine
 
-Converts NavCore state into **when to speak** — you provide the TTS library.
+Converts NavCore state into **when to speak** â€” you provide the TTS library.
 
 ### How it works
 
 ```
-engine.update(gps) → NavCoreState
-                          │
+engine.update(gps) â†’ NavCoreState
+                          â”‚
                     voice.update(state)
-                          │
+                          â”‚
                     checks: distance to next instruction
-                          │
-                   in trigger window?  → VoiceCue
-                   no?               → null
+                          â”‚
+                   in trigger window?  â†’ VoiceCue
+                   no?               â†’ null
 ```
 
 The trigger window is speed-adaptive: at 80 km/h the window opens earlier (120m+) than at 30 km/h (40m).
@@ -58,8 +58,8 @@ navigator.geolocation.watchPosition(({ coords }) => {
 | Priority | When | Use case |
 |---|---|---|
 | `low` | Re-announce (far away) | Lower TTS volume or skip |
-| `normal` | Standard window (80–120m) | Normal voice |
-| `high` | Close (30–80m) | Interrupt other audio |
+| `normal` | Standard window (80â€“120m) | Normal voice |
+| `high` | Close (30â€“80m) | Interrupt other audio |
 | `urgent` | Very close (<30m) | Override all audio |
 
 ### Direct event hook
@@ -102,12 +102,12 @@ The ETA is unreliable when:
 - Not enough speed samples have been collected yet (first few seconds)
 - The vehicle has been stopped the whole time and no route distance is available
 
-When unreliable, show `—` or a loading state rather than a misleading value.
+When unreliable, show `â€”` or a loading state rather than a misleading value.
 
 ### Handling traffic / stops
 
 The engine uses the last **reliable** speed (above 0.5 m/s) when the vehicle stops.
-This prevents ETA showing `∞` at a red light.
+This prevents ETA showing `âˆž` at a red light.
 
 ```typescript
 const eta = new ETAEngine({
@@ -130,7 +130,7 @@ import { GeofencingEngine } from '@ingissa/navcore-core';
 
 const geo = new GeofencingEngine({ dwellThresholdMs: 10_000 });
 
-// Register zones — second argument is the human-readable name
+// Register zones â€” second argument is the human-readable name
 geo.addCircle('school-zone', 'School Zone', [2.3522, 48.8566], 50, { speedLimit: 30 });
 geo.addPolygon('exam-area', 'Zone A', [
   [2.340, 48.850], [2.360, 48.850],
@@ -179,7 +179,7 @@ console.log(geo.listIds());
 ### Dwell detection
 
 The `dwell` event fires every `dwellThresholdMs` while the vehicle stays inside a zone.
-This means it can fire **multiple times** for long stays — useful for timing exam sequences.
+This means it can fire **multiple times** for long stays â€” useful for timing exam sequences.
 
 ```typescript
 const geo = new GeofencingEngine({ dwellThresholdMs: 5000 }); // every 5 seconds

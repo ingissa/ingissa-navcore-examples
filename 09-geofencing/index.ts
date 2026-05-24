@@ -1,5 +1,5 @@
 /**
- * Example 09 — Geofencing Engine
+ * Example 09 â€” Geofencing Engine
  *
  * Demonstrates circle + polygon zones, enter/exit/dwell events, isInside checks.
  * Run: npx tsx examples/09-geofencing/index.ts
@@ -28,16 +28,16 @@ function main() {
   for (const coord of path) {
     const events = geo.update(coord);
     for (const evt of events) {
-      const icon = evt.type === 'enter' ? '→' : evt.type === 'exit' ? '←' : '⏱';
+      const icon = evt.type === 'enter' ? 'â†’' : evt.type === 'exit' ? 'â†' : 'â±';
       console.log(`${icon} [${evt.type}] ${evt.id} at [${coord}]`);
     }
-    if (!events.length) console.log(`· No events at [${coord}]`);
+    if (!events.length) console.log(`Â· No events at [${coord}]`);
   }
 
   console.log('\n=== isInside checks ===');
   const test: [number, number] = [2.3520, 48.8565];
   for (const id of geo.listIds()) {
-    console.log(`  ${geo.isInside(id, test) ? '✅' : '❌'} ${id}`);
+    console.log(`  ${geo.isInside(id, test) ? 'âœ…' : 'âŒ'} ${id}`);
   }
 }
 

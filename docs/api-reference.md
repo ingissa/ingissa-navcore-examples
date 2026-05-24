@@ -1,6 +1,6 @@
 # API Reference
 
-## `NavCore` — Main Engine
+## `NavCore` â€” Main Engine
 
 ### Constructor Options (`NavCoreOptions`)
 
@@ -21,7 +21,7 @@
 ```typescript
 engine.setRoute(route: Coordinate[], instructions?: NavInstruction[]): void
 engine.startNavigation(): void
-engine.update(gps: NavGpsUpdate): NavCoreState   // main tick — runs all 11 stages
+engine.update(gps: NavGpsUpdate): NavCoreState   // main tick â€” runs all 11 stages
 engine.tick(nowMs: number): NavCoreState           // dead-reckoning advance (call at RAF)
 engine.getState(): NavCoreState
 engine.destroy(): void
@@ -34,9 +34,9 @@ engine.off(event, handler): void
 | Event | Payload | When |
 |---|---|---|
 | `routeLoaded` | `{ routeLength }` | `setRoute()` called |
-| `navigationStarted` | — | `startNavigation()` called |
+| `navigationStarted` | â€” | `startNavigation()` called |
 | `instruction` | `NavInstruction` | Instruction enters trigger window |
-| `arrival` | — | Destination reached |
+| `arrival` | â€” | Destination reached |
 | `deviation` | `{ anchorIndex, ghostCoord }` | Off-route confirmed |
 
 ### `NavGpsUpdate`
@@ -80,17 +80,17 @@ interface NavCoreState {
 
 ```typescript
 const builder = new CustomRouteBuilder();
-builder.addWaypoint([lng, lat], { name?: string, silent?: boolean })  // → id
-builder.insertWaypoint(coord, afterId)   // → id
+builder.addWaypoint([lng, lat], { name?: string, silent?: boolean })  // â†’ id
+builder.insertWaypoint(coord, afterId)   // â†’ id
 builder.removeWaypoint(id)
 builder.moveWaypoint(id, newCoord)
-builder.getWaypoints()                   // → ReadonlyArray<CustomWaypoint>
-builder.chunk('OVERLAP_1', 25)           // → Coordinate[][]
-builder.buildStraightLine()              // → { geometry, waypoints }
+builder.getWaypoints()                   // â†’ ReadonlyArray<CustomWaypoint>
+builder.chunk('OVERLAP_1', 25)           // â†’ Coordinate[][]
+builder.buildStraightLine()              // â†’ { geometry, waypoints }
 builder.fromGPX(gpxString)
-builder.toGPX()                          // → string
+builder.toGPX()                          // â†’ string
 builder.fromGeoJSON(geojson)
-builder.toGeoJSON()                      // → FeatureCollection
+builder.toGeoJSON()                      // â†’ FeatureCollection
 builder.clear()
 builder.size                             // number
 ```
@@ -110,8 +110,8 @@ editor.update(id, patch)
 editor.remove(id)
 editor.sort()
 editor.attachToCumulative(route)   // auto-compute cumulativeOffset + bearings
-editor.toArray()                   // → NavInstruction[] (use with setRoute)
-editor.toRichArray()               // → RichInstruction[] (with type/severity/meta)
+editor.toArray()                   // â†’ NavInstruction[] (use with setRoute)
+editor.toRichArray()               // â†’ RichInstruction[] (with type/severity/meta)
 editor.size                        // number
 ```
 
@@ -161,8 +161,8 @@ interface MapRendererAdapter {
 | Adapter | Package | Peer dep |
 |---|---|---|
 | `HeadlessAdapter` | `@ingissa/navcore-headless` | none |
-| `MapLibreAdapter` | `@ingissa/navcore-maplibre` | maplibre-gl ≥3 |
-| `LeafletAdapter` | `@ingissa/navcore-leaflet` | leaflet ≥1.9 |
+| `MapLibreAdapter` | `@ingissa/navcore-maplibre` | maplibre-gl â‰¥3 |
+| `LeafletAdapter` | `@ingissa/navcore-leaflet` | leaflet â‰¥1.9 |
 | `GoogleMapsAdapter` | `@ingissa/navcore-google-maps` | @types/google.maps |
 
 ---
@@ -172,8 +172,8 @@ interface MapRendererAdapter {
 ```typescript
 const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 120 });
 voice.setInstructions(instructions)
-const cue = voice.update(state)     // → VoiceCue | null
-voice.onInstruction(instr, state)   // → VoiceCue (direct)
+const cue = voice.update(state)     // â†’ VoiceCue | null
+voice.onInstruction(instr, state)   // â†’ VoiceCue (direct)
 voice.reset()
 
 interface VoiceCue {
@@ -220,7 +220,7 @@ interface GeofencingOptions {
 ### Methods
 
 ```typescript
-// Registration — name is the human-readable label shown in events
+// Registration â€” name is the human-readable label shown in events
 geo.addCircle(id: string, name: string, center: Coordinate, radiusM: number, meta?: unknown): string
 geo.addPolygon(id: string, name: string, coords: Coordinate[], meta?: unknown): string
 geo.remove(id: string): void
@@ -228,8 +228,8 @@ geo.clear(): void
 geo.listIds(): string[]
 
 // Runtime
-const events = geo.update(coord: Coordinate)       // → GeofenceEvent[]
-geo.isInside(id: string, coord: Coordinate)        // → boolean
+const events = geo.update(coord: Coordinate)       // â†’ GeofenceEvent[]
+geo.isInside(id: string, coord: Coordinate)        // â†’ boolean
 ```
 
 ### `GeofenceEvent`
@@ -277,13 +277,13 @@ const uturn = resolver.isLikelyUTurn(bearing, segA, segB);
 
 ---
 
-## `HeadlessAdapter` — Test Assertions
+## `HeadlessAdapter` â€” Test Assertions
 
 ```typescript
 const adapter = new HeadlessAdapter();
 adapter.assertReached([lng, lat], 30)   // throws if not reached within 30m
 adapter.assertArrived()                  // throws if hasArrived never true
 adapter.assertNeverOffRoute()            // throws if ever off-route
-adapter.getHistory()                     // → PositionRecord[]
+adapter.getHistory()                     // â†’ PositionRecord[]
 adapter.reset()
 ```

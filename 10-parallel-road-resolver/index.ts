@@ -1,5 +1,5 @@
 /**
- * Example 10 — Parallel Road Resolver
+ * Example 10 â€” Parallel Road Resolver
  *
  * Demonstrates:
  * - ParallelRoadResolver standalone usage (without NavCore engine)
@@ -23,15 +23,15 @@ function main() {
     inertiaSegmentDist: 3,
   });
 
-  // ── Scenario 1: Dual carriageway disambiguation ───────────────────────────
+  // â”€â”€ Scenario 1: Dual carriageway disambiguation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('=== Scenario 1: Dual carriageway ===\n');
-  console.log('Vehicle heading NORTH (bearing ~0°)');
-  console.log('Two parallel road segments — one going north, one going south\n');
+  console.log('Vehicle heading NORTH (bearing ~0Â°)');
+  console.log('Two parallel road segments â€” one going north, one going south\n');
 
   const northSegA: [number, number] = [2.350, 48.856];
-  const northSegB: [number, number] = [2.350, 48.858]; // bearing ~0° (north)
+  const northSegB: [number, number] = [2.350, 48.858]; // bearing ~0Â° (north)
   const southSegA: [number, number] = [2.352, 48.858];
-  const southSegB: [number, number] = [2.352, 48.856]; // bearing ~180° (south)
+  const southSegB: [number, number] = [2.352, 48.856]; // bearing ~180Â° (south)
 
   const candidates: SnapCandidate[] = [
     {
@@ -60,11 +60,11 @@ function main() {
 
   console.log('\nResolved order (winner first):');
   resolved.forEach((c, i) => {
-    const winner = i === 0 ? '✅ WINNER' : '  ';
+    const winner = i === 0 ? 'âœ… WINNER' : '  ';
     console.log(
       `${winner} Segment ${c.segmentIndex}: ` +
       `dist=${c.distanceMetres}m, ` +
-      `bearingDelta=${c.bearingDeltaDeg?.toFixed(0)}°, ` +
+      `bearingDelta=${c.bearingDeltaDeg?.toFixed(0)}Â°, ` +
       `score=${c.score.toFixed(0)}, ` +
       `inertia=${c.inertiaPenaltyApplied}`
     );
@@ -72,24 +72,24 @@ function main() {
 
   // Without resolver: segment 5 wins (it's 4m closer)
   // With resolver: segment 5 still wins because bearing matches
-  console.log('\n→ Both agree here because the closer segment also matches bearing.\n');
+  console.log('\nâ†’ Both agree here because the closer segment also matches bearing.\n');
 
-  // ── Scenario 2: U-turn snap prevention ───────────────────────────────────
+  // â”€â”€ Scenario 2: U-turn snap prevention â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('=== Scenario 2: U-turn snap prevention ===\n');
-  console.log('Vehicle heading SOUTH (bearing ~180°) but snapper found segment going NORTH\n');
+  console.log('Vehicle heading SOUTH (bearing ~180Â°) but snapper found segment going NORTH\n');
 
   const uTurnCandidates: SnapCandidate[] = [
     {
       segmentIndex: 3,
       projectedCoord: [2.350, 48.857],
-      distanceMetres: 5,   // very close — wrong direction
+      distanceMetres: 5,   // very close â€” wrong direction
       segA: northSegA,
       segB: northSegB,     // this segment goes NORTH
     },
     {
       segmentIndex: 8,
       projectedCoord: [2.351, 48.857],
-      distanceMetres: 15,  // further away — correct direction
+      distanceMetres: 15,  // further away â€” correct direction
       segA: southSegA,
       segB: southSegB,     // this segment goes SOUTH
     },
@@ -101,16 +101,16 @@ function main() {
   console.log('Without resolver: segment 3 would win (5m vs 15m)');
   console.log('\nWith resolver (winner first):');
   uResolved.forEach((c, i) => {
-    const winner = i === 0 ? '✅ WINNER' : '  ';
+    const winner = i === 0 ? 'âœ… WINNER' : '  ';
     console.log(
       `${winner} Segment ${c.segmentIndex}: ` +
       `score=${c.score.toFixed(0)} ` +
       `(dist=${c.distanceMetres}m + bearingPenalty=${(c.score - c.distanceMetres).toFixed(0)})`
     );
   });
-  console.log('\n→ Resolver correctly prefers segment 8 (south) despite being further.\n');
+  console.log('\nâ†’ Resolver correctly prefers segment 8 (south) despite being further.\n');
 
-  // ── Scenario 3: isLikelyUTurn ─────────────────────────────────────────────
+  // â”€â”€ Scenario 3: isLikelyUTurn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('=== Scenario 3: isLikelyUTurn() ===\n');
   const cases = [
     { bearing: 5,   segA: northSegA, segB: northSegB, label: 'North vehicle on north road' },
@@ -120,7 +120,7 @@ function main() {
 
   for (const c of cases) {
     const uturn = resolver.isLikelyUTurn(c.bearing, c.segA, c.segB);
-    console.log(`  ${uturn ? '🔄 U-TURN' : '✅ OK    '} — ${c.label}`);
+    console.log(`  ${uturn ? 'ðŸ”„ U-TURN' : 'âœ… OK    '} â€” ${c.label}`);
   }
 }
 
