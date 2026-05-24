@@ -2,9 +2,8 @@
 
 Welcome to the **NavCore SDK Examples Hub**! This directory contains a comprehensive set of examples designed to demonstrate the versatility of the `@ingissa/navcore-sdk` navigation engine. 
 
-The examples are split into two categories:
+The examples are split into one category:
 1. **Standalone CLI & Browser Demos (01 - 11)**: Pure TypeScript/Node files for offline core utility testing, rapid CLI verification, and static HTML browser visualizers.
-2. **Mobile Expo Complete Navigation Suite (12)**: A production-quality React Native navigation app demonstrating four map renderers (Leaflet, Google Maps, Mapbox, and MapLibre) running off a single unified navigation state and simulated GPS engine.
 
 ---
 
@@ -26,14 +25,6 @@ The examples are split into two categories:
 | **10** | Parallel Road Snapping | `ParallelRoadResolver` U-turn scoring and protection | ❌ None (100% Offline) |
 | **11** | Headless Testing | CI/CD testing pipeline with programmatic mocks | ✅ OSRM (free public API) |
 
-### Mobile Expo Suite (12)
-
-| Variant Screen | Map Renderer Library | Directions Provider | Works in Expo Go | Needs Key? | Setup Complexity |
-|----------------|----------------------|---------------------|------------------|------------|------------------|
-| **Leaflet** | Leaflet.js inside WebView | `OSRMDirectionsProvider` | ✅ Yes | ❌ None | 🟢 Low (None) |
-| **Google** | `react-native-maps` | `OSRMDirectionsProvider` | ⚠️ Partial\* | ✅ Google Maps | 🟡 Medium |
-| **Mapbox** | `@rnmapbox/maps` | `MapboxDirections` | 🔧 Dev Build | ✅ Mapbox Token | 🔴 High |
-| **MapLibre** | `@maplibre/maplibre` | `ValhallaDirectionsProvider` | 🔧 Dev Build | ❌ None | 🔴 High |
 
 > \* Google Maps renders tiles in Expo Go only if Google Play Services is available on the emulator or device **and** a valid Maps API key is configured.
 
@@ -93,106 +84,6 @@ npx tsx examples/10-parallel-road-resolver/index.ts
 
 ---
 
-## 📱 Mobile Examples: Expo Complete Navigation (12)
-
-The `12-expo-complete-navigation` project is a fully-fledged Expo application containing four mobile screens:
-- `leaflet`: Leaflet.js map layer within a webview wrapper. **No native setups required!**
-- `google`: Standard Google Maps using standard native hooks.
-- `mapbox`: Premium vector-tile Mapbox rendering.
-- `maplibre`: Fully open-source MapLibre vector maps rendering.
-
-### Switching Active Screens
-To change which map screen is running in your active mobile simulator, modify the root `App.tsx` file inside the workspace:
-
-```tsx
-import LeafletExample from './packages/navcore-sdk/examples/12-expo-complete-navigation/leaflet/index';
-import GoogleExample  from './packages/navcore-sdk/examples/12-expo-complete-navigation/google/index';
-import MapboxExample  from './packages/navcore-sdk/examples/12-expo-complete-navigation/mapbox/index';
-import MapLibreExample from './packages/navcore-sdk/examples/12-expo-complete-navigation/maplibre/index';
-
-export default function App() {
-    return <LeafletExample />;   // ← Swap this to render a different map variant
-    // return <GoogleExample />;
-    // return <MapboxExample />;
-    // return <MapLibreExample />;
-}
-```
-
----
-
-## 🔧 Environment Variables Config (`.env.local`)
-
-To run the full suite of mobile examples, copy or create a `.env.local` file in the root workspace directory with the following variables:
-
-```bash
-# ── MAPBOX CONFIGURATION ──────────────────────────────────────────────────────
-# Public access token for runtime tile rendering
-EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_mapbox_public_token_here
-
-# Secret access token used ONLY during gradle/cocoapod download phase
-RNMAPBOX_MAPS_DOWNLOAD_TOKEN=sk.your_mapbox_secret_download_token_here
-
-# ── GOOGLE MAPS CONFIGURATION ────────────────────────────────────────────────
-# API key for maps SDK
-EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyYourGoogleMapsApiKeyHere
-
-# ── VALHALLA CONFIGURATION ───────────────────────────────────────────────────
-# Optional self-hosted Valhalla URL. Defaults to OpenStreetMap public instance if empty.
-EXPO_PUBLIC_VALHALLA_URL=http://localhost:8002
-```
-
-> [!CAUTION]
-> Never commit `.env.local` containing private keys or secret keys to version control. It is already added to `.gitignore`.
-
----
-
-## 🛠️ Detailed Mobile Variant Setup Guides
-
-### 1. Leaflet (Expo Go — 🟢 Out of the Box)
-Uses Leaflet CDN inside a standard Expo `WebView`.
-- **API Keys**: None required.
-- **Directions Backend**: Casablanca Medina Loop from the public OSRM API.
-- **Run command**:
-  ```bash
-  npx expo start
-  # Scan QR with Expo Go on your mobile or hit 'a' / 'i'
-  ```
-
-### 2. Google Maps (Expo Go — 🟡 Key Required)
-Uses `react-native-maps` to draw native platform mapping.
-- **API Keys**: Requires a Google Maps API Key with **Maps SDK for Android** and **Maps SDK for iOS** enabled in the [Google Cloud Console](https://console.cloud.google.com/).
-- **Setup**:
-  1. Add `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` to `.env.local`.
-  2. Launch via `npx expo start`.
-- **Important**: Your emulator must have **Google Play Services** installed. Use a **Google Play Store** system image in Android Studio.
-
-### 3. Mapbox (Development Build — 🔴 Native Linking)
-Uses the high-performance `@rnmapbox/maps` rendering engine.
-- **API Keys**: Mapbox Public token (`pk.*`) and Secret download token (`sk.*`) are required.
-- **Setup**:
-  1. Register the tokens in your `.env.local`.
-  2. Run `npx expo prebuild` to inject native Gradle hooks.
-  3. Compile and build:
-     ```bash
-     npx expo run:android
-     # or
-     npx expo run:ios
-     ```
-
-### 4. MapLibre (Development Build — 🔴 Native Linking)
-Uses `@maplibre/maplibre-react-native` for a 100% open-source vector map solution.
-- **API Keys**: None required!
-- **Directions Backend**: Uses Valhalla (`ValhallaDirectionsProvider`).
-- **Setup**:
-  1. Run `npx expo prebuild` to configure Android/iOS projects.
-  2. Compile and launch:
-     ```bash
-     npx expo run:android
-     ```
-  3. Optionally spin up a local Valhalla routing container:
-     ```bash
-     docker run -p 8002:8002 ghcr.io/valhalla/valhalla:latest
-     ```
 
 ---
 
