@@ -1,4 +1,4 @@
-# NavCore SDK — Examples Hub
+# NavCore SDK - Examples Hub
 
 Welcome to the **NavCore SDK Examples Hub**! This directory contains a comprehensive set of examples designed to demonstrate the versatility of the `@ingissa/navcore-sdk` navigation engine. 
 
@@ -8,38 +8,38 @@ The examples are split into two categories:
 
 ---
 
-## 🗺️ Compatibility Matrix
+##     Compatibility Matrix
 
 ### Standalone Demos (01 - 11)
 
 | Example | Title | Key Features Demonstrated | Network / API Dependency |
 |---------|-------|---------------------------|--------------------------|
-| **01** | Basic Navigation | Standard snapping & route progress updates | ✅ OSRM (free public API) |
-| **02** | Custom Route Builder | `CustomRouteBuilder`, GPX, and GeoJSON export | ✅ OSRM (free public API) |
-| **03** | Instruction Editor | `InstructionEditor` fluent custom turn additions | ✅ OSRM (free public API) |
-| **04** | MapLibre Web | HTML generation + `MapLibreAdapter` browser camera | ✅ OSRM (free public API) |
-| **05** | Leaflet Web | HTML generation + `LeafletAdapter` browser tiles | ✅ OSRM (free public API) |
-| **06** | Directions Providers | Comparative OSRM vs. Valhalla vs. OpenRouteService | ✅ All three providers |
-| **07** | Voice Triggers | Standalone `VoiceTriggerEngine` priority vocal queues | ✅ OSRM (free public API) |
-| **08** | ETA Engine | Standalone `ETAEngine` rolling average speed metrics | ✅ OSRM (free public API) |
-| **09** | Geofencing | Standalone offline `GeofencingEngine` zones | ❌ None (100% Offline) |
-| **10** | Parallel Road Snapping | `ParallelRoadResolver` U-turn scoring and protection | ❌ None (100% Offline) |
-| **11** | Headless Testing | CI/CD testing pipeline with programmatic mocks | ✅ OSRM (free public API) |
+| **01** | Basic Navigation | Standard snapping & route progress updates |   OSRM (free public API) |
+| **02** | Custom Route Builder | `CustomRouteBuilder`, GPX, and GeoJSON export |   OSRM (free public API) |
+| **03** | Instruction Editor | `InstructionEditor` fluent custom turn additions |   OSRM (free public API) |
+| **04** | MapLibre Web | HTML generation + `MapLibreAdapter` browser camera |   OSRM (free public API) |
+| **05** | Leaflet Web | HTML generation + `LeafletAdapter` browser tiles |   OSRM (free public API) |
+| **06** | Directions Providers | Comparative OSRM vs. Valhalla vs. OpenRouteService |   All three providers |
+| **07** | Voice Triggers | Standalone `VoiceTriggerEngine` priority vocal queues |   OSRM (free public API) |
+| **08** | ETA Engine | Standalone `ETAEngine` rolling average speed metrics |   OSRM (free public API) |
+| **09** | Geofencing | Standalone offline `GeofencingEngine` zones |   None (100% Offline) |
+| **10** | Parallel Road Snapping | `ParallelRoadResolver` U-turn scoring and protection |   None (100% Offline) |
+| **11** | Headless Testing | CI/CD testing pipeline with programmatic mocks |   OSRM (free public API) |
 
 ### Mobile Expo Suite (12)
 
 | Variant Screen | Map Renderer Library | Directions Provider | Works in Expo Go | Needs Key? | Setup Complexity |
 |----------------|----------------------|---------------------|------------------|------------|------------------|
-| **Leaflet** | Leaflet.js inside WebView | `OSRMDirectionsProvider` | ✅ Yes | ❌ None | 🟢 Low (None) |
-| **Google** | `react-native-maps` | `OSRMDirectionsProvider` | ⚠️ Partial\* | ✅ Google Maps | 🟡 Medium |
-| **Mapbox** | `@rnmapbox/maps` | `MapboxDirections` | 🔧 Dev Build | ✅ Mapbox Token | 🔴 High |
-| **MapLibre** | `@maplibre/maplibre` | `ValhallaDirectionsProvider` | 🔧 Dev Build | ❌ None | 🔴 High |
+| **Leaflet** | Leaflet.js inside WebView | `OSRMDirectionsProvider` |   Yes |   None |    Low (None) |
+| **Google** | `react-native-maps` | `OSRMDirectionsProvider` | [!]  Partial\* |   Google Maps |    Medium |
+| **Mapbox** | `@rnmapbox/maps` | `MapboxDirections` |    Dev Build |   Mapbox Token |    High |
+| **MapLibre** | `@maplibre/maplibre` | `ValhallaDirectionsProvider` |    Dev Build |   None |    High |
 
 > \* Google Maps renders tiles in Expo Go only if Google Play Services is available on the emulator or device **and** a valid Maps API key is configured.
 
 ---
 
-## 🏗️ Architecture & Data Flow
+##     Architecture & Data Flow
 
 Below is the standard premium pipeline utilized across both the headless test frameworks and the React Native screens. A synthetic or live GPS signal is smoothed, snapped to a route, and fed into individual Pro engines to generate state variables:
 
@@ -57,7 +57,7 @@ graph TD
 
 ---
 
-## 🚀 Installation & Prerequisites
+##    Installation & Prerequisites
 
 From the monorepo root directory, install all required dependencies (peer dependencies are handled via the legacy flag for mobile modules):
 
@@ -68,7 +68,7 @@ npm install --legacy-peer-deps
 
 ---
 
-## 💻 Running Standalone Examples (01 - 11)
+##    Running Standalone Examples (01 - 11)
 
 All standalone Node examples use direct TypeScript execution. Run them with `npx tsx`:
 

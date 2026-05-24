@@ -1,6 +1,6 @@
 # Renderer Adapters
 
-NavCore's engine outputs a `NavCoreState` on every tick. Renderer adapters translate that state into map library calls Ã¢â‚¬â€ drawing the route, moving the vehicle marker, and panning the camera.
+NavCore's engine outputs a `NavCoreState` on every tick. Renderer adapters translate that state into map library calls          drawing the route, moving the vehicle marker, and panning the camera.
 
 ## The `MapRendererAdapter` Interface
 
@@ -16,7 +16,7 @@ interface MapRendererAdapter {
 
 ---
 
-## `HeadlessAdapter` Ã¢â‚¬â€ Node.js / CI / Testing
+## `HeadlessAdapter`          Node.js / CI / Testing
 
 No map library required. Records all state for assertions.
 
@@ -41,7 +41,7 @@ console.log(`Recorded ${adapter.getHistory().length} positions`);
 
 ---
 
-## `MapLibreAdapter` Ã¢â‚¬â€ MapLibre GL JS
+## `MapLibreAdapter`          MapLibre GL JS
 
 ```bash
 npm install maplibre-gl @ingissa/navcore-maplibre
@@ -60,7 +60,7 @@ const map = new maplibregl.Map({
 });
 
 const adapter = new MapLibreAdapter(map, {
-  vehicleHtml: '<div class="my-vehicle-icon">Ã°Å¸Å¡â€”</div>',  // optional custom icon
+  vehicleHtml: '<div class="my-vehicle-icon">         </div>',  // optional custom icon
 });
 
 map.on('load', () => {
@@ -85,14 +85,14 @@ window.addEventListener('beforeunload', () => adapter.destroy());
 interface RouteStyle {
   color?: string;        // CSS color (default: '#7c3aed')
   width?: number;        // pixels (default: 4)
-  opacity?: number;      // 0Ã¢â‚¬â€œ1 (default: 0.9)
+  opacity?: number;      // 0        1 (default: 0.9)
   dashArray?: number[];  // e.g. [8, 4] for dashed line
 }
 ```
 
 ---
 
-## `LeafletAdapter` Ã¢â‚¬â€ Leaflet.js
+## `LeafletAdapter`          Leaflet.js
 
 ```bash
 npm install leaflet @ingissa/navcore-leaflet
@@ -106,7 +106,7 @@ import { LeafletAdapter } from '@ingissa/navcore-leaflet';
 
 const map = L.map('map').setView([48.86, 2.35], 14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: 'Ã‚Â© OpenStreetMap contributors',
+  attribution: '     OpenStreetMap contributors',
 }).addTo(map);
 
 const adapter = new LeafletAdapter(map);
@@ -124,7 +124,7 @@ engine.on('update', (state) => {
 
 ---
 
-## `GoogleMapsAdapter` Ã¢â‚¬â€ Google Maps JS API v3
+## `GoogleMapsAdapter`          Google Maps JS API v3
 
 ```html
 <!-- In your HTML (replace YOUR_KEY) -->

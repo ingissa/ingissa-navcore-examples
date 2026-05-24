@@ -1,5 +1,5 @@
 /**
- * Example 01 — Basic Navigation
+ * Example 01 - Basic Navigation
  *
  * Demonstrates the minimal setup to get NavCore running:
  * - OSRMDirectionsProvider (self-hosted, zero cost)
@@ -12,7 +12,7 @@
 import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
 
 async function main() {
-  // ── 1. Get route from OSRM (public demo server — use self-hosted in production) ──
+  // -- 1. Get route from OSRM (public demo server - use self-hosted in production) --
   const provider = new OSRMDirectionsProvider({
     baseUrl: 'http://router.project-osrm.org',
     profile: 'driving',
@@ -26,7 +26,7 @@ async function main() {
 
   console.log(`Route: ${route.geometry.length} points, ${(route.distance / 1000).toFixed(1)}km, ${Math.round(route.duration / 60)}min`);
 
-  // ── 2. Create the engine ──────────────────────────────────────────────────
+  // -- 2. Create the engine --------------------------------------------------
   const DEV_BYPASS_KEY =
     'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 
@@ -35,28 +35,28 @@ async function main() {
     arrivalThresholdMeters: 20,
   });
 
-  // ── 3. Listen to events ───────────────────────────────────────────────────
+  // -- 3. Listen to events -------------------------------------------------- 
   engine.on('routeLoaded', ({ routeLength }: any) => {
-    console.log(`✓ Route loaded (${routeLength} points)`);
+    console.log(`[OK] Route loaded (${routeLength} points)`);
   });
 
   engine.on('instruction', (instr: any) => {
-    console.log(`🗣  Instruction: ${instr.text ?? instr.instruction}`);
+    console.log(`    Instruction: ${instr.text ?? instr.instruction}`);
   });
 
   engine.on('arrival', () => {
-    console.log('🏁 Arrived!');
+    console.log('   Arrived!');
   });
 
   engine.on('deviation', ({ anchorIndex }: any) => {
-    console.log(`⚠️  Off-route at segment ${anchorIndex}`);
+    console.log(`[!]   Off-route at segment ${anchorIndex}`);
   });
 
-  // ── 4. Load route ─────────────────────────────────────────────────────────
+  // -- 4. Load route -------------------------------------------------------- 
   engine.setRoute(route.geometry);
   engine.startNavigation();
 
-  // ── 5. Simulate GPS updates along the route ───────────────────────────────
+  // -- 5. Simulate GPS updates along the route ------------------------------ 
   console.log('\nSimulating navigation...\n');
 
   for (let i = 0; i < route.geometry.length; i += 5) {
@@ -80,7 +80,7 @@ async function main() {
       const dist = state.distanceToDestination;
       console.log(
         `  [${i}] idx=${state.routeIndex}  ` +
-        `dist=${dist !== null ? (dist / 1000).toFixed(2) + 'km' : '—'}  ` +
+        `dist=${dist !== null ? (dist / 1000).toFixed(2) + 'km' : '-'}  ` +
         `offRoute=${state.isOffRoute}  ` +
         `arrived=${state.hasArrived}`
       );

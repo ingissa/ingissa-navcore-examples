@@ -4,6 +4,7 @@
   "description": "Interactive examples for NavCore SDK",
   "main": "01-basic-navigation/index.ts",
   "scripts": {
+    "start": "tsx 01-basic-navigation/index.ts",
     "start:01": "tsx 01-basic-navigation/index.ts",
     "start:02": "tsx 02-custom-route-builder/index.ts"
   },

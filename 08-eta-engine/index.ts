@@ -1,5 +1,5 @@
 /**
- * Example 08 — ETA Engine
+ * Example 08 - ETA Engine
  *
  * Demonstrates:
  * - ETAEngine with rolling speed average
@@ -24,11 +24,11 @@ async function main() {
   console.log(`Route: ${(route.distance / 1000).toFixed(2)}km`);
   console.log(`OSRM estimate: ${Math.round(route.duration / 60)} min\n`);
 
-  // ── Scenario 1: Constant speed ────────────────────────────────────────────
+  // -- Scenario 1: Constant speed --------------------------------------------
   console.log('=== Scenario 1: Constant 30 km/h ===\n');
   await runSimulation(geometry, () => 8.33); // 30 km/h
 
-  // ── Scenario 2: Variable speed ────────────────────────────────────────────
+  // -- Scenario 2: Variable speed --------------------------------------------
   console.log('\n=== Scenario 2: Variable speed (traffic) ===\n');
   await runSimulation(geometry, (i, total) => {
     // Slow down in the middle (simulate traffic)
@@ -37,7 +37,7 @@ async function main() {
     return 11.1; // ~40 km/h
   });
 
-  // ── Scenario 3: With stops ────────────────────────────────────────────────
+  // -- Scenario 3: With stops ------------------------------------------------
   console.log('\n=== Scenario 3: With stop at red light ===\n');
   await runSimulation(geometry, (i, total) => {
     const progress = i / total;
@@ -78,7 +78,7 @@ async function runSimulation(
       const distKm = ((state.distanceToDestination ?? 0) / 1000).toFixed(2);
       const etaMin = result.isReliable ? Math.ceil(result.etaSeconds / 60) : '?';
       const speedKmh = (result.averageSpeedMs * 3.6).toFixed(0);
-      const reliable = result.isReliable ? '✅' : '⏳';
+      const reliable = result.isReliable ? ' ' : ' ';
 
       console.log(
         `  ${reliable} dist=${distKm}km  ` +
@@ -91,7 +91,7 @@ async function runSimulation(
     }
 
     if (state.hasArrived) {
-      console.log('  🏁 Arrived!');
+      console.log('     Arrived!');
       break;
     }
   }

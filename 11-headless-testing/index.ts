@@ -1,5 +1,5 @@
 /**
- * Example 11 — Headless Testing
+ * Example 11 - Headless Testing
  *
  * Demonstrates how to write CI-friendly navigation tests using:
  * - HeadlessAdapter (no browser/map required)
@@ -16,7 +16,7 @@ import { HeadlessAdapter } from '@ingissa/navcore-headless';
 const DEV_BYPASS_KEY =
   'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers ------------------------------------------------------------------ 
 
 async function getRoute(start: [number, number], end: [number, number]) {
   const provider = new OSRMDirectionsProvider({
@@ -46,7 +46,7 @@ function simulateGps(
   }
 }
 
-// ── Test 1: Happy path ────────────────────────────────────────────────────────
+// -- Test 1: Happy path --------------------------------------------------------
 
 async function testHappyPath() {
   console.log('Test 1: Happy path navigation...');
@@ -66,11 +66,11 @@ async function testHappyPath() {
   adapter.assertNeverOffRoute();
   adapter.assertReached(route.geometry[route.geometry.length - 1] as [number, number], 50);
 
-  console.log(`  ✅ Arrived after ${adapter.getHistory().length} GPS updates`);
+  console.log(`    Arrived after ${adapter.getHistory().length} GPS updates`);
   engine.destroy();
 }
 
-// ── Test 2: Off-route detection ───────────────────────────────────────────────
+// -- Test 2: Off-route detection ---------------------------------------------- 
 
 async function testOffRouteDetection() {
   console.log('Test 2: Off-route detection...');
@@ -100,12 +100,12 @@ async function testOffRouteDetection() {
   const finalState = engine.getState();
   console.log(`  Off-route state: ${finalState.offRouteState}`);
   console.log(`  Deviation event fired: ${deviationFired}`);
-  console.log(`  ✅ Off-route correctly detected`);
+  console.log(`    Off-route correctly detected`);
 
   engine.destroy();
 }
 
-// ── Test 3: Arrival threshold ─────────────────────────────────────────────────
+// -- Test 3: Arrival threshold ------------------------------------------------ 
 
 async function testArrivalThreshold() {
   console.log('Test 3: Arrival threshold...');
@@ -121,14 +121,14 @@ async function testArrivalThreshold() {
     simulateGps(engine, adapter, route.geometry as [number, number][]);
 
     const arrived = adapter.getHistory().some(r => r.state.hasArrived);
-    console.log(`  threshold=${threshold}m → arrived=${arrived}`);
+    console.log(`  threshold=${threshold}m   arrived=${arrived}`);
     engine.destroy();
   }
 
-  console.log('  ✅ All thresholds tested');
+  console.log('    All thresholds tested');
 }
 
-// ── Run all tests ─────────────────────────────────────────────────────────────
+// -- Run all tests ------------------------------------------------------------ 
 
 async function main() {
   console.log('=== NavCore Headless Tests ===\n');
@@ -137,10 +137,10 @@ async function main() {
   await testOffRouteDetection();
   await testArrivalThreshold();
 
-  console.log('\n✅ All tests passed');
+  console.log('\n  All tests passed');
 }
 
 main().catch(err => {
-  console.error('❌ Test failed:', err.message);
+  console.error('  Test failed:', err.message);
   process.exit(1);
 });
