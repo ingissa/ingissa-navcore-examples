@@ -28,7 +28,7 @@ The trigger window is speed-adaptive: at 80 km/h the window opens earlier (120m+
 ```typescript
 import { NavCore, VoiceTriggerEngine, InstructionEditor } from '@ingissa/navcore-core';
 
-const engine = new NavCore({ isDev: true });
+const engine = new NavCore({ });
 const voice = new VoiceTriggerEngine({
   earlyTriggerMeters: 120,   // Trigger 120m before instruction
   lateTriggerMeters: 10,     // Give up if 10m past

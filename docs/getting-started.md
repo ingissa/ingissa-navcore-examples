@@ -47,7 +47,7 @@ console.log(result.duration, 'seconds');
 import { NavCore } from '@ingissa/navcore-core';
 
 const engine = new NavCore({
-  isDev: true,  // use in development Ã¢â‚¬â€ remove in production and add licenseKey
+  // use in development Ã¢â‚¬â€ remove in production and add licenseKey
 });
 ```
 
@@ -137,7 +137,7 @@ engine.destroy();
 
 ## Development Mode vs Production
 
-In `isDev: true` mode:
+In `` mode:
 - All licensed features are unlocked
 - A warning is logged to console on each `update()` call
 - No license validation is performed
@@ -179,7 +179,7 @@ import { NavCore } from '@ingissa/navcore-core';
 import * as Location from 'expo-location';
 
 export function useNavCore() {
-  const engineRef = useRef(new NavCore({ isDev: true }));
+  const engineRef = useRef(new NavCore({ }));
 
   useEffect(() => {
     const engine = engineRef.current;

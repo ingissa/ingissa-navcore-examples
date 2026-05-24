@@ -1,5 +1,5 @@
 /**
- * Example 07 Ã¢â‚¬â€ Voice Trigger Engine
+ * Example 07 — Voice Trigger Engine
  *
  * Demonstrates:
  * - VoiceTriggerEngine with speed-adaptive trigger windows
@@ -73,7 +73,7 @@ async function main() {
     if (cue) {
       triggeredCues.push(cue.text);
       const distStr = cue.distanceMetres.toFixed(0).padStart(4);
-      console.log(`  Ã°Å¸â€”Â£  [${distStr}m, ${cue.priority.padEnd(6)}] "${cue.text}"`);
+      console.log(`  🗣  [${distStr}m, ${cue.priority.padEnd(6)}] "${cue.text}"`);
     }
 
     if (state.hasArrived) break;
@@ -85,5 +85,3 @@ async function main() {
 }
 
 main().catch(console.error);
-
-
