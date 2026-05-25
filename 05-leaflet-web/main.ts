@@ -117,10 +117,15 @@ function startSimulation() {
     }
     
     const current = currentRoute[idx];
+    
+    // Inject artificial noise (jitter) for demonstration
+    const noise = (Math.random() - 0.5) * 0.00015; // Approx 10-15 meters of noise
+    const noisyCoord: [number, number] = [current[0] + noise, current[1] + noise];
+    
     const next = currentRoute[idx + 1] || current;
     const bearing = getBearingBetweenPoints(current, next);
     
-    updateState(current, 5, bearing, 13.8); // 50 km/h
+    updateState(noisyCoord, 5, bearing, 13.8); // 50 km/h
     idx++;
   }, 500);
   
