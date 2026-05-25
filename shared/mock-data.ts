@@ -1,10 +1,20 @@
 /**
- * Pre-fetched route: Paris center -> Arc de Triomphe
- * Used as fallback when running in StackBlitz (no HTTP access).
+ * Shared mock data for NavCore SDK examples.
+ * Used as fallback when network requests fail (e.g. in StackBlitz).
  */
-export const MOCK_ROUTE = {
-  distance: 5842,   // meters
-  duration: 682,    // seconds (~11 min)
+
+export interface MockRoute {
+  distance: number;
+  duration: number;
+  geometry: [number, number][];
+}
+
+/**
+ * Pre-fetched route: Paris center -> Arc de Triomphe
+ */
+export const PARIS_MOCK_ROUTE: MockRoute = {
+  distance: 5842,
+  duration: 682,
   geometry: [
     [2.35220, 48.85660],
     [2.35198, 48.85672],
@@ -56,3 +66,8 @@ export const MOCK_ROUTE = {
     [2.30090, 48.87410],
   ] as [number, number][],
 };
+
+/**
+ * Message shown when falling back to mock data.
+ */
+export const MOCK_FALLBACK_MESSAGE = 'Network unavailable (StackBlitz?) - using pre-fetched mock route.\n';

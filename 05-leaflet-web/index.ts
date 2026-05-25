@@ -1,9 +1,9 @@
+import { PARIS_MOCK_ROUTE } from '../shared/mock-data';
+
+const MOCK_DATA_JSON = JSON.stringify(PARIS_MOCK_ROUTE);
+
 /**
  * Example 05 - Leaflet Web
- *
- * Full browser navigation page using Leaflet.js + NavCore.
- * Paste this HTML into index.html and open in a browser.
- * No API key required - uses OSM tiles + OSRM routing.
  */
 
 export const HTML = `<!DOCTYPE html>
@@ -35,6 +35,8 @@ export const HTML = `<!DOCTYPE html>
     import { NavCore, OSRMDirectionsProvider, ETAEngine } from './navcore-core.js';
     import { LeafletAdapter } from './navcore-leaflet.js';
 
+    const MOCK_ROUTE = ${MOCK_DATA_JSON};
+
     const map = L.map('map').setView([48.86, 2.35], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '  OpenStreetMap'
@@ -49,7 +51,15 @@ export const HTML = `<!DOCTYPE html>
     const WAYPOINTS = [[2.3522, 48.8566], [2.3009, 48.8741]];
 
     async function init() {
-      const route = await provider.getRoute(WAYPOINTS);
+      let route;
+      try {
+        console.log('Fetching route...');
+        route = await provider.getRoute(WAYPOINTS);
+      } catch (e) {
+        console.warn('Network unavailable - using pre-fetched mock route.');
+        route = MOCK_ROUTE;
+      }
+
       adapter.drawRoute(route.geometry, { color: '#7c3aed', width: 5 });
       engine.setRoute(route.geometry);
       engine.startNavigation();
@@ -79,6 +89,6 @@ export const HTML = `<!DOCTYPE html>
     init();
   </script>
 </body>
-</html>`;
+</html>\`;
 
 console.log(HTML);

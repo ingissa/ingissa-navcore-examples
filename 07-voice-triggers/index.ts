@@ -18,10 +18,20 @@ import {
   InstructionEditor,
   OSRMDirectionsProvider,
 } from '@ingissa/navcore-core';
+import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
-  const route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
+  
+  let route;
+  try {
+    console.log('Fetching route from OSRM...');
+    route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
+  } catch {
+    console.log(MOCK_FALLBACK_MESSAGE);
+    route = PARIS_MOCK_ROUTE;
+  }
+  
   const geometry = route.geometry;
 
   // Build instructions

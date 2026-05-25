@@ -10,7 +10,7 @@
  */
 
 import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
-import { MOCK_ROUTE } from './mock-route';
+import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   // -- 1. Get route (live OSRM or pre-fetched fallback for StackBlitz) ------
@@ -28,8 +28,8 @@ async function main() {
       [2.3009, 48.8741],  // Arc de Triomphe
     ]);
   } catch {
-    console.log('Network unavailable (StackBlitz?) - using pre-fetched route.\n');
-    route = MOCK_ROUTE;
+    console.log(MOCK_FALLBACK_MESSAGE);
+    route = PARIS_MOCK_ROUTE;
   }
 
   console.log(`Route: ${route.geometry.length} points, ${(route.distance / 1000).toFixed(1)}km, ${Math.round(route.duration / 60)}min`);

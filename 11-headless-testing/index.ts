@@ -11,7 +11,8 @@
  */
 
 import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
-import { HeadlessAdapter } from '@ingissa/navcore-headless';
+import { HeadlessAdapter } from '@navcore/headless';
+import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 const DEV_BYPASS_KEY =
   'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
@@ -22,7 +23,13 @@ async function getRoute(start: [number, number], end: [number, number]) {
   const provider = new OSRMDirectionsProvider({
     baseUrl: 'http://router.project-osrm.org',
   });
-  return provider.getRoute([start, end]);
+  
+  try {
+    return await provider.getRoute([start, end]);
+  } catch {
+    console.log(MOCK_FALLBACK_MESSAGE);
+    return PARIS_MOCK_ROUTE;
+  }
 }
 
 function simulateGps(
@@ -110,6 +117,7 @@ async function testOffRouteDetection() {
 async function testArrivalThreshold() {
   console.log('Test 3: Arrival threshold...');
   const route = await getRoute([2.3522, 48.8566], [2.3009, 48.8741]);
+  // @ts-ignore
   const dest = route.geometry[route.geometry.length - 1] as [number, number];
 
   for (const threshold of [5, 15, 30, 50]) {

@@ -15,10 +15,20 @@ import {
   ETAEngine,
   OSRMDirectionsProvider,
 } from '@ingissa/navcore-core';
+import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
-  const route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
+  
+  let route;
+  try {
+    console.log('Fetching route from OSRM...');
+    route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
+  } catch {
+    console.log(MOCK_FALLBACK_MESSAGE);
+    route = PARIS_MOCK_ROUTE;
+  }
+  
   const geometry = route.geometry;
 
   console.log(`Route: ${(route.distance / 1000).toFixed(2)}km`);
@@ -26,11 +36,11 @@ async function main() {
 
   // -- Scenario 1: Constant speed --------------------------------------------
   console.log('=== Scenario 1: Constant 30 km/h ===\n');
-  await runSimulation(geometry, () => 8.33); // 30 km/h
+  await runSimulation(geometry as [number, number][], () => 8.33); // 30 km/h
 
   // -- Scenario 2: Variable speed --------------------------------------------
   console.log('\n=== Scenario 2: Variable speed (traffic) ===\n');
-  await runSimulation(geometry, (i, total) => {
+  await runSimulation(geometry as [number, number][], (i, total) => {
     // Slow down in the middle (simulate traffic)
     const progress = i / total;
     if (progress > 0.3 && progress < 0.7) return 2.0; // ~7 km/h
@@ -39,7 +49,7 @@ async function main() {
 
   // -- Scenario 3: With stops ------------------------------------------------
   console.log('\n=== Scenario 3: With stop at red light ===\n');
-  await runSimulation(geometry, (i, total) => {
+  await runSimulation(geometry as [number, number][], (i, total) => {
     const progress = i / total;
     if (progress > 0.45 && progress < 0.55) return 0; // stopped
     return 8.33;
@@ -60,7 +70,6 @@ async function runSimulation(
   engine.startNavigation();
 
   const printInterval = Math.floor(geometry.length / 8);
-  let lastEtaSeconds = 0;
 
   for (let i = 0; i < geometry.length; i++) {
     const speed = speedFn(i, geometry.length);
@@ -86,8 +95,6 @@ async function runSimulation(
         `eta=${etaMin}min  ` +
         `(raw=${result.etaSeconds}s)`
       );
-
-      lastEtaSeconds = result.etaSeconds;
     }
 
     if (state.hasArrived) {

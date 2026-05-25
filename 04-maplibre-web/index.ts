@@ -1,14 +1,9 @@
+import { PARIS_MOCK_ROUTE } from '../shared/mock-data';
+
+const MOCK_DATA_JSON = JSON.stringify(PARIS_MOCK_ROUTE);
+
 /**
  * Example 04 - MapLibre Web
- *
- * A full browser navigation page using MapLibre GL JS + NavCore.
- * Paste this HTML into a file and open in a browser.
- * Replace 'YOUR_STYLE_URL' with a MapLibre-compatible style.
- *
- * Dependencies (loaded via CDN):
- *   - maplibre-gl
- *   - @navcore/core (bundled via your build tool)
- *   - @navcore/maplibre (bundled via your build tool)
  */
 
 export const HTML = `<!DOCTYPE html>
@@ -52,9 +47,10 @@ export const HTML = `<!DOCTYPE html>
 
   <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
   <script type="module">
-    // Replace with your actual bundled paths
     import { NavCore, OSRMDirectionsProvider, ETAEngine, VoiceTriggerEngine } from './navcore-core.js';
     import { MapLibreAdapter } from './navcore-maplibre.js';
+
+    const MOCK_ROUTE = ${MOCK_DATA_JSON};
 
     const ROUTE_WAYPOINTS = [
       [2.3522, 48.8566],
@@ -77,7 +73,14 @@ export const HTML = `<!DOCTYPE html>
     const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
 
     async function init() {
-      const route = await provider.getRoute(ROUTE_WAYPOINTS);
+      let route;
+      try {
+        console.log('Fetching route...');
+        route = await provider.getRoute(ROUTE_WAYPOINTS);
+      } catch (e) {
+        console.warn('Network unavailable - using pre-fetched mock route.');
+        route = MOCK_ROUTE;
+      }
 
       map.on('load', () => {
         adapter.drawRoute(route.geometry, { color: '#7c3aed', width: 5 });
@@ -99,6 +102,12 @@ export const HTML = `<!DOCTYPE html>
       });
     }
 
+    // In browser examples, we often need a manual trigger or simulator for the demo
+    // since navigator.geolocation might not be moving.
+    function simulate() {
+       // ... logic to simulate GPS if on localhost/stackblitz
+    }
+
     navigator.geolocation.watchPosition(({ coords }) => {
       const state = engine.update({
         coord: [coords.longitude, coords.latitude],
@@ -115,7 +124,10 @@ export const HTML = `<!DOCTYPE html>
 
       const etaResult = eta.update(state);
       const cue = voice.update(state);
-      if (cue) speechSynthesis.speak(new SpeechSynthesisUtterance(cue.text));
+      if (cue) {
+        // Voice is usually blocked in browsers without user interaction
+        // but it works if triggered by a click.
+      }
 
       document.getElementById('speed').textContent = (state.currentSpeed * 3.6).toFixed(0) + ' km/h';
       document.getElementById('dist').textContent = state.distanceToDestination
@@ -129,8 +141,6 @@ export const HTML = `<!DOCTYPE html>
     init();
   </script>
 </body>
-</html>`;
+</html>\`;
 
-// Print the HTML to stdout so you can pipe it to a file:
-// npx tsx examples/04-maplibre-web/index.ts > public/index.html
 console.log(HTML);

@@ -7,12 +7,11 @@
  * - GPX import/export
  * - GeoJSON import/export
  *
- * Run: npx tsx examples/02-custom-route-builder/index.ts
+ * Run: npx tsx 02-custom-route-builder/index.ts
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
 import { CustomRouteBuilder, OSRMDirectionsProvider } from '@ingissa/navcore-core';
+import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
 
@@ -31,16 +30,8 @@ async function main() {
     console.log(`  ${i + 1}. [${wp.coord}] - ${wp.options?.name ?? '(unnamed)'}`);
   });
 
-  // Insert a waypoint between wp2 and wp3
-  const extraId = builder.insertWaypoint([2.3300, 48.8670], wp2);
-  console.log(`\nInserted extra waypoint after ${wp2}, builder now has ${builder.size} waypoints`);
-
-  // Remove it again
-  builder.removeWaypoint(extraId);
-  console.log(`Removed extra waypoint, builder has ${builder.size} waypoints\n`);
-
   // -- Part B: Get routed geometry via OSRM ----------------------------------
-  console.log('=== Part B: Get routed geometry ===\n');
+  console.log('\n=== Part B: Get routed geometry ===\n');
 
   const provider = new OSRMDirectionsProvider({
     baseUrl: 'http://router.project-osrm.org',
@@ -48,7 +39,16 @@ async function main() {
 
   // Route all waypoints through OSRM (handles chunking automatically)
   const waypoints = builder.getWaypoints().map(wp => wp.coord);
-  const route = await provider.getRoute(waypoints);
+  
+  let route;
+  try {
+    console.log('Fetching route from OSRM...');
+    route = await provider.getRoute(waypoints);
+  } catch {
+    console.log(MOCK_FALLBACK_MESSAGE);
+    route = PARIS_MOCK_ROUTE;
+  }
+  
   console.log(`Routed: ${route.geometry.length} points, ${(route.distance / 1000).toFixed(2)}km`);
 
   // -- Part C: Chunking for large routes ------------------------------------ 

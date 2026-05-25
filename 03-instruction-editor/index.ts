@@ -7,7 +7,7 @@
  * - Attaching offsets to route geometry
  * - Using instructions with the NavCore engine
  *
- * Run: npx tsx examples/03-instruction-editor/index.ts
+ * Run: npx tsx 03-instruction-editor/index.ts
  */
 
 import {
@@ -15,6 +15,7 @@ import {
   InstructionEditor,
   OSRMDirectionsProvider,
 } from '@ingissa/navcore-core';
+import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({
@@ -28,8 +29,15 @@ async function main() {
     [2.3009, 48.8741],
   ];
 
-  console.log('Fetching route...');
-  const route = await provider.getRoute(waypoints);
+  let route;
+  try {
+    console.log('Fetching route from OSRM...');
+    route = await provider.getRoute(waypoints);
+  } catch {
+    console.log(MOCK_FALLBACK_MESSAGE);
+    route = PARIS_MOCK_ROUTE;
+  }
+  
   const geometry = route.geometry;
   console.log(`Route: ${geometry.length} points\n`);
 
@@ -40,9 +48,9 @@ async function main() {
     .addDepart(geometry[0]!, 'Head north on Rue de Rivoli')
     .addTurn(
       geometry[Math.floor(geometry.length * 0.25)]!,
-      'Turn left onto Avenue des Champs- lys es',
+      'Turn left onto Avenue des Champs-Elysées',
       Math.floor(geometry.length * 0.25),
-      { meta: { streetName: 'Avenue des Champs- lys es' } }
+      { meta: { streetName: 'Avenue des Champs-Elysées' } }
     )
     .addExamPoint(
       geometry[Math.floor(geometry.length * 0.4)]!,
@@ -93,8 +101,8 @@ async function main() {
   engine.startNavigation();
 
   engine.on('instruction', (instr: any) => {
-    const rich = editor.toRichArray().find(r => r.geometryIndex === instr.geometryIndex);
-    const tag = rich?.type === 'exam_point' ? `[!]   [${rich.severity}]` : '   ';
+    const r = editor.toRichArray().find(rich => rich.geometryIndex === instr.geometryIndex);
+    const tag = r?.type === 'exam_point' ? `[!]   [${r.severity}]` : '   ';
     console.log(`${tag} ${instr.text}`);
   });
 
