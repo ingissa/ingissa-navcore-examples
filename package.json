@@ -8,8 +8,8 @@
     "start:01": "tsx 01-basic-navigation/index.ts",
     "start:02": "tsx 02-custom-route-builder/index.ts",
     "dev": "vite",
-    "dev:04": "vite --open examples/04-maplibre-web/index.html",
-    "dev:05": "vite --open examples/05-leaflet-web/index.html"
+    "dev:04": "vite --open 04-maplibre-web/index.html",
+    "dev:05": "vite --open 05-leaflet-web/index.html"
   },
   "dependencies": {
     "@ingissa/navcore-core": "^1.0.4",

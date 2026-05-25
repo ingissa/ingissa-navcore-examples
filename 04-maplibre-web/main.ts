@@ -1,4 +1,4 @@
-import * as maplibregl from 'maplibre-gl';
+import maplibregl from 'maplibre-gl';
 import { NavCore, OSRMDirectionsProvider, ETAEngine, VoiceTriggerEngine } from '@ingissa/navcore-core';
 import { MapLibreAdapter } from '@ingissa/navcore-maplibre';
 import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
@@ -9,7 +9,6 @@ const ROUTE_WAYPOINTS: [number, number][] = [
 ];
 
 // Initialize Map
-// @ts-ignore
 const map = new maplibregl.Map({
   container: 'map',
   style: 'https://demotiles.maplibre.org/style.json',
