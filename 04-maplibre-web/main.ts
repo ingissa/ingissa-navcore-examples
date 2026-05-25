@@ -36,12 +36,15 @@ const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 100 });
 const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
 
 async function init() {
-  let route;
+  let route: any;
   try {
     console.log('Fetching route from OSRM...');
-    route = await provider.getRoute(ROUTE_WAYPOINTS);
-  } catch (e) {
-    console.warn(MOCK_FALLBACK_MESSAGE);
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+    route = await Promise.race([provider.getRoute(ROUTE_WAYPOINTS), timeout]);
+    alert('Route fetched from OSRM!');
+  } catch (e: any) {
+    console.warn(MOCK_FALLBACK_MESSAGE, e);
+    alert('OSRM failed or timed out: ' + e.message + '. Using mock data.');
     route = PARIS_MOCK_ROUTE;
   }
 

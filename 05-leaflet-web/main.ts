@@ -29,12 +29,16 @@ const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-o
 const WAYPOINTS: [number, number][] = [[2.3522, 48.8566], [2.3009, 48.8741]];
 
 async function init() {
-  let route;
+  let route: any;
   try {
     console.log('Fetching route from OSRM...');
-    route = await provider.getRoute(WAYPOINTS);
-  } catch (e) {
-    console.warn(MOCK_FALLBACK_MESSAGE);
+    // Add a race timeout to ensure we don't hang forever
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+    route = await Promise.race([provider.getRoute(WAYPOINTS), timeout]);
+    alert('Route fetched from OSRM!');
+  } catch (e: any) {
+    console.warn(MOCK_FALLBACK_MESSAGE, e);
+    alert('OSRM failed or timed out: ' + e.message + '. Using mock data.');
     route = PARIS_MOCK_ROUTE;
   }
 
