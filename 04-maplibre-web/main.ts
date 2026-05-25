@@ -123,7 +123,16 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
 
   if (displayCoord) {
     adapter.updateVehicle(displayCoord, displayBearing, state);
-    adapter.panCamera(displayCoord, displayBearing, { zoom: 16, pitch: 50 });
+    
+    // Offset camera so vehicle is at the bottom (Standard Nav Layout)
+    map.easeTo({
+      center: displayCoord as [number, number],
+      bearing: displayBearing,
+      zoom: 16,
+      pitch: 50,
+      offset: [0, 200], // Move map down, vehicle stays at bottom
+      duration: 300
+    });
   }
 
   const etaResult = eta.update(state);

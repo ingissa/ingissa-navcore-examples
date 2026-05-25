@@ -81,6 +81,9 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   if (displayCoord) {
     adapter.updateVehicle(displayCoord, displayBearing, state);
     adapter.panCamera(displayCoord, displayBearing, { zoom: 16 });
+    
+    // Offset camera so vehicle is at the bottom (Standard Nav Layout)
+    map.panBy([0, -180], { animate: false });
 
     // COURSE-UP ENHANCEMENT: Rotate map so vehicle heads Top
     const mapEl = document.getElementById('map')!;
