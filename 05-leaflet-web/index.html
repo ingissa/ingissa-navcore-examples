@@ -20,6 +20,10 @@
     #hud b { color: #f8fafc; }
     #status { color: #94a3b8; }
     .navcore-vehicle-marker svg { display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+    .raw-marker { background: rgba(255, 255, 255, 0.4); border: 2px solid white; border-radius: 50%; width: 12px; height: 12px; }
+    .controls { margin-top: 15px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; font-size: 11px; }
+    .controls label { display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 4px 0; }
+    .controls input { cursor: pointer; accent-color: #7c3aed; }
   </style>
 </head>
 <body>
@@ -33,14 +37,32 @@
       NavCore + Leaflet
     </h3>
     <div class="stat">Speed: <b id="speed">0 km/h</b></div>
-    <div class="stat">Destionation: <b id="dist">-</b></div>
+    <div class="stat">Distance: <b id="dist">-</b></div>
+    <div class="stat">ETA: <b id="eta">-</b></div>
     <div class="stat">Status: <b id="status">Waiting for GPS...</b></div>
     <div style="margin-top:12px; display: flex; gap: 8px;">
       <button id="start-sim" style="flex: 1; background: #7c3aed; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer;">Start Simulation</button>
       <button id="stop-sim" style="background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer;">Stop</button>
     </div>
+
+    <div class="controls">
+      <div style="color: #94a3b8; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; font-size: 10px;">SDK Features</div>
+      <label>
+        <input type="checkbox" id="toggle-snap" checked> 
+        <span>Route Snapping</span>
+      </label>
+      <label>
+        <input type="checkbox" id="toggle-smooth" checked> 
+        <span>GPS Smoothing (Kalman)</span>
+      </label>
+      <label style="margin-top: 8px; color: #94a3b8;">
+        <div style="width: 10px; height: 10px; border-radius: 50%; border: 1px solid white; background: rgba(255,255,255,0.3);"></div>
+        <span>White dot = Raw Input</span>
+      </label>
+    </div>
+
     <div style="margin-top:10px; font-size:11px; color:#64748b; border-top:1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-      Simulation moves along the route at 50km/h
+      Observe the lavender marker snapping to the route line.
     </div>
   </div>
   

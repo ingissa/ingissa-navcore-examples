@@ -18,12 +18,15 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 const adapter = new LeafletAdapter(map);
+const rawMarker = L.circleMarker([0, 0], { 
+  radius: 5, color: '#fff', weight: 2, fillOpacity: 0.5, fillColor: '#fff' 
+}).addTo(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 const engine = new NavCore({ 
   licenseKey: DEV_BYPASS_KEY,
   baseCorridorMeters: 50 // Balanced for production
 });
-const eta = new ETAEngine();
+const eta = new ETAEngine({ speedWindowSize: 1 });
 const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
 
 // Setup Simulation State
@@ -65,15 +68,31 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
     timestamp: Date.now(),
   });
 
-  if (state.snappedCoord) {
-    console.log('✅ Snapped to route:', state.snappedCoord, 'Distance:', state.distanceToRoute);
-    adapter.updateVehicle(state.snappedCoord, state.bearing, state);
-    adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16 });
+  const isSnapEnabled = (document.getElementById('toggle-snap') as HTMLInputElement).checked;
+  const isSmoothEnabled = (document.getElementById('toggle-smooth') as HTMLInputElement).checked;
+
+  if (state.rawGpsCoord) {
+    rawMarker.setLatLng([state.rawGpsCoord[1], state.rawGpsCoord[0]]);
+  }
+
+  const displayCoord = isSnapEnabled ? state.snappedCoord : (isSmoothEnabled ? state.rawGpsCoord : coord);
+  const displayBearing = isSnapEnabled ? state.bearing : (bearing || 0);
+
+  if (displayCoord) {
+    adapter.updateVehicle(displayCoord, displayBearing, state);
+    adapter.panCamera(displayCoord, displayBearing, { zoom: 16 });
   }
 
   const etaResult = eta.update(state);
-  document.getElementById('dist')!.textContent = `${(etaResult.distanceRemainingM / 1000).toFixed(1)} km`;
+  const distM = etaResult.distanceRemainingM || state.distanceToDestination || 0;
+  document.getElementById('dist')!.textContent = `${(distM / 1000).toFixed(1)} km`;
   document.getElementById('speed')!.textContent = `${Math.round(speed * 3.6)} km/h`;
+  
+  const minutes = etaResult.isReliable 
+    ? Math.ceil(etaResult.etaSeconds / 60) 
+    : Math.ceil((distM / Math.max(speed, 1)) / 60);
+
+  document.getElementById('eta')!.textContent = `${minutes} min`;
     
   if (state.hasArrived) {
     document.getElementById('status')!.textContent = '🏁 Arrived!';

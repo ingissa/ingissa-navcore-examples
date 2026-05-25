@@ -25,6 +25,15 @@ const map = new maplibregl.Map({
 });
 
 const adapter = new MapLibreAdapter(map);
+const ghostEl = document.createElement('div');
+ghostEl.style.width = '10px';
+ghostEl.style.height = '10px';
+ghostEl.style.borderRadius = '50%';
+ghostEl.style.background = 'white';
+ghostEl.style.boxShadow = '0 0 10px white';
+ghostEl.style.opacity = '0.6';
+const ghostMarker = new maplibregl.Marker({ element: ghostEl }).setLngLat([0, 0]).addTo(map);
+
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 
 // Setup Simulation State
@@ -35,7 +44,7 @@ const engine = new NavCore({
   licenseKey: DEV_BYPASS_KEY,
   baseCorridorMeters: 50 // Balanced for production
 });
-const eta = new ETAEngine();
+const eta = new ETAEngine({ speedWindowSize: 1 });
 const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 100 });
 
 const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
@@ -102,18 +111,31 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
     timestamp: Date.now(),
   });
 
-  if (state.snappedCoord) {
-    console.log('✅ Snapped to route:', state.snappedCoord, 'Distance:', state.distanceToRoute);
-    adapter.updateVehicle(state.snappedCoord, state.bearing, state);
-    adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16, pitch: 50 });
-  } else {
-    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute, 'License:', state.licenseStatus);
+  const isSnapEnabled = (document.getElementById('toggle-snap') as HTMLInputElement).checked;
+  const isSmoothEnabled = (document.getElementById('toggle-smooth') as HTMLInputElement).checked;
+
+  if (state.rawGpsCoord) {
+    ghostMarker.setLngLat(state.rawGpsCoord as [number, number]);
+  }
+
+  const displayCoord = isSnapEnabled ? state.snappedCoord : (isSmoothEnabled ? state.rawGpsCoord : coord);
+  const displayBearing = isSnapEnabled ? state.bearing : (bearing || 0);
+
+  if (displayCoord) {
+    adapter.updateVehicle(displayCoord, displayBearing, state);
+    adapter.panCamera(displayCoord, displayBearing, { zoom: 16, pitch: 50 });
   }
 
   const etaResult = eta.update(state);
-  document.getElementById('dist')!.textContent = `${(etaResult.distanceRemainingM / 1000).toFixed(1)} km`;
+  const distM = etaResult.distanceRemainingM || state.distanceToDestination || 0;
+  document.getElementById('dist')!.textContent = `${(distM / 1000).toFixed(1)} km`;
   document.getElementById('speed')!.textContent = `${Math.round(speed * 3.6)} km/h`;
-  document.getElementById('eta')!.textContent = etaResult.isReliable ? `${Math.ceil(etaResult.etaSeconds / 60)} min` : '--';
+  
+  const minutes = etaResult.isReliable 
+    ? Math.ceil(etaResult.etaSeconds / 60) 
+    : Math.ceil((distM / Math.max(speed, 1)) / 60);
+
+  document.getElementById('eta')!.textContent = `${minutes} min`;
 }
 
 // Automated Simulation Logic
