@@ -11,7 +11,7 @@
  */
 
 import { NavCore, OSRMDirectionsProvider } from '@ingissa/navcore-core';
-import { HeadlessAdapter } from '@navcore/headless';
+import { HeadlessAdapter } from '@ingissa/navcore-headless';
 import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 const DEV_BYPASS_KEY =
@@ -23,7 +23,7 @@ async function getRoute(start: [number, number], end: [number, number]) {
   const provider = new OSRMDirectionsProvider({
     baseUrl: 'http://router.project-osrm.org',
   });
-  
+
   try {
     return await provider.getRoute([start, end]);
   } catch {
