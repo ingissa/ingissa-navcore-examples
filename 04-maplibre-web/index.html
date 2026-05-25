@@ -47,8 +47,12 @@
     <p>Speed: <b id="speed">0 km/h</b></p>
     <p>Distance: <b id="dist">-</b></p>
     <p>ETA: <b id="eta">-</b></p>
+    <div style="margin-top:12px; display: flex; gap: 8px;">
+      <button id="start-sim" style="flex: 1; background: #4f46e5; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">Start Simulation</button>
+      <button id="stop-sim" style="background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">Stop</button>
+    </div>
     <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#64748b;">
-      Click the map to simulate location if GPS is static
+      Simulation moves along the route at 50km/h
     </div>
   </div>
   <div id="instruction"></div>

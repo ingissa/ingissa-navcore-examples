@@ -1,12 +1,12 @@
 import * as L from 'leaflet';
-import { NavCore, OSRMDirectionsProvider, ETAEngine } from '@ingissa/navcore-core';
+(window as any).L = L;
+import { NavCore, OSRMDirectionsProvider, ETAEngine, getBearingBetweenPoints } from '@ingissa/navcore-core';
 import { LeafletAdapter } from '@ingissa/navcore-leaflet';
 import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 // Global error tracking
 window.onerror = (msg, url, line, col, error) => {
   console.error('GLOBAL ERROR:', msg, 'at', line, ':', col, error);
-  alert('Error: ' + msg);
   return false;
 };
 
@@ -21,10 +21,14 @@ const adapter = new LeafletAdapter(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 const engine = new NavCore({ 
   licenseKey: DEV_BYPASS_KEY,
-  baseCorridorMeters: 500 // Extremely wide for debugging
+  baseCorridorMeters: 50 // Balanced for production
 });
 const eta = new ETAEngine();
 const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
+
+// Setup Simulation State
+let simInterval: any = null;
+let currentRoute: [number, number][] = [];
 
 const WAYPOINTS: [number, number][] = [[2.3522, 48.8566], [2.3009, 48.8741]];
 
@@ -32,13 +36,11 @@ async function init() {
   let route: any;
   try {
     console.log('Fetching route from OSRM...');
-    // Add a race timeout to ensure we don't hang forever
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
     route = await Promise.race([provider.getRoute(WAYPOINTS), timeout]);
-    alert('Route fetched from OSRM!');
+    console.log('Route fetched from OSRM!');
   } catch (e: any) {
     console.warn(MOCK_FALLBACK_MESSAGE, e);
-    alert('OSRM failed or timed out: ' + e.message + '. Using mock data.');
     route = PARIS_MOCK_ROUTE;
   }
 
@@ -48,6 +50,7 @@ async function init() {
   adapter.drawRoute(route.geometry, { color: '#8b5cf6', width: 6 });
   engine.setRoute(route.geometry);
   engine.startNavigation();
+  currentRoute = route.geometry;
   
   document.getElementById('status')!.textContent = 'Navigating';
   document.getElementById('status')!.style.color = '#a78bfa';
@@ -66,16 +69,11 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
     console.log('✅ Snapped to route:', state.snappedCoord, 'Distance:', state.distanceToRoute);
     adapter.updateVehicle(state.snappedCoord, state.bearing, state);
     adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16 });
-  } else {
-    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute, 'License:', state.licenseStatus);
   }
 
   const etaResult = eta.update(state);
-  
-  document.getElementById('speed')!.textContent = (state.currentSpeed * 3.6).toFixed(0) + ' km/h';
-  document.getElementById('dist')!.textContent = etaResult.isReliable
-    ? (etaResult.distanceRemainingM / 1000).toFixed(1) + ' km (' + Math.ceil(etaResult.etaSeconds / 60) + ' min)'
-    : state.distanceToDestination ? (state.distanceToDestination / 1000).toFixed(1) + ' km' : '-';
+  document.getElementById('dist')!.textContent = `${(etaResult.distanceRemainingM / 1000).toFixed(1)} km`;
+  document.getElementById('speed')!.textContent = `${Math.round(speed * 3.6)} km/h`;
     
   if (state.hasArrived) {
     document.getElementById('status')!.textContent = '🏁 Arrived!';

@@ -1,12 +1,12 @@
 import maplibregl from 'maplibre-gl';
-import { NavCore, OSRMDirectionsProvider, ETAEngine, VoiceTriggerEngine } from '@ingissa/navcore-core';
+(window as any).maplibregl = maplibregl;
+import { NavCore, OSRMDirectionsProvider, ETAEngine, VoiceTriggerEngine, getBearingBetweenPoints } from '@ingissa/navcore-core';
 import { MapLibreAdapter } from '@ingissa/navcore-maplibre';
 import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 // Global error tracking
 window.onerror = (msg, url, line, col, error) => {
   console.error('GLOBAL ERROR:', msg, 'at', line, ':', col, error);
-  alert('Error: ' + msg);
   return false;
 };
 
@@ -26,9 +26,14 @@ const map = new maplibregl.Map({
 
 const adapter = new MapLibreAdapter(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
+
+// Setup Simulation State
+let simInterval: any = null;
+let currentRoute: [number, number][] = [];
+
 const engine = new NavCore({ 
   licenseKey: DEV_BYPASS_KEY,
-  baseCorridorMeters: 500 // Extremely wide for debugging
+  baseCorridorMeters: 50 // Balanced for production
 });
 const eta = new ETAEngine();
 const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 100 });
@@ -41,10 +46,9 @@ async function init() {
     console.log('Fetching route from OSRM...');
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
     route = await Promise.race([provider.getRoute(ROUTE_WAYPOINTS), timeout]);
-    alert('Route fetched from OSRM!');
+    console.log('Route fetched from OSRM!');
   } catch (e: any) {
     console.warn(MOCK_FALLBACK_MESSAGE, e);
-    alert('OSRM failed or timed out: ' + e.message + '. Using mock data.');
     route = PARIS_MOCK_ROUTE;
   }
 
@@ -58,8 +62,9 @@ async function init() {
     // 2. Load route into engine
     engine.setRoute(route.geometry);
     engine.startNavigation();
+    currentRoute = route.geometry;
     
-    // 3. Sync voice instructions
+    // 3. Setup HUD
     voice.setInstructions([...engine.getInstructions()]);
     
     document.getElementById('status')!.textContent = 'Navigating';
@@ -106,16 +111,45 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   }
 
   const etaResult = eta.update(state);
-  
-  // Update HUD
-  document.getElementById('speed')!.textContent = (state.currentSpeed * 3.6).toFixed(0) + ' km/h';
-  document.getElementById('dist')!.textContent = state.distanceToDestination
-    ? (state.distanceToDestination / 1000).toFixed(1) + ' km'
-    : '-';
-  document.getElementById('eta')!.textContent = etaResult.isReliable
-    ? Math.ceil(etaResult.etaSeconds / 60) + ' min'
-    : 'Calculating...';
+  document.getElementById('dist')!.textContent = `${(etaResult.distanceRemainingM / 1000).toFixed(1)} km`;
+  document.getElementById('speed')!.textContent = `${Math.round(speed * 3.6)} km/h`;
+  document.getElementById('eta')!.textContent = etaResult.isReliable ? `${Math.ceil(etaResult.etaSeconds / 60)} min` : '--';
 }
+
+// Automated Simulation Logic
+function startSimulation() {
+  if (simInterval || currentRoute.length === 0) return;
+  
+  let idx = 0;
+  simInterval = setInterval(() => {
+    if (idx >= currentRoute.length) {
+      stopSimulation();
+      return;
+    }
+    
+    const current = currentRoute[idx];
+    const next = currentRoute[idx + 1] || current;
+    const bearing = getBearingBetweenPoints(current, next);
+    
+    updateState(current, 5, bearing, 13.8); // 50 km/h
+    idx++;
+  }, 500);
+  
+  document.getElementById('status')!.textContent = 'Simulating...';
+  document.getElementById('status')!.style.color = '#10b981';
+}
+
+function stopSimulation() {
+  if (simInterval) {
+    clearInterval(simInterval);
+    simInterval = null;
+  }
+  document.getElementById('status')!.textContent = 'Navigating (Static)';
+  document.getElementById('status')!.style.color = '#60a5fa';
+}
+
+document.getElementById('start-sim')!.addEventListener('click', startSimulation);
+document.getElementById('stop-sim')!.addEventListener('click', stopSimulation);
 
 // WebContainer Simulation / Manual Clicking
 map.on('click', (e: any) => {
