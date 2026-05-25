@@ -3,6 +3,13 @@ import { NavCore, OSRMDirectionsProvider, ETAEngine } from '@ingissa/navcore-cor
 import { LeafletAdapter } from '@ingissa/navcore-leaflet';
 import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
+// Global error tracking
+window.onerror = (msg, url, line, col, error) => {
+  console.error('GLOBAL ERROR:', msg, 'at', line, ':', col, error);
+  alert('Error: ' + msg);
+  return false;
+};
+
 // Initialize Map
 const map = L.map('map').setView([48.8566, 2.3522], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -14,7 +21,7 @@ const adapter = new LeafletAdapter(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 const engine = new NavCore({ 
   licenseKey: DEV_BYPASS_KEY,
-  baseCorridorMeters: 100 // Wider corridor for easier manual simulation
+  baseCorridorMeters: 500 // Extremely wide for debugging
 });
 const eta = new ETAEngine();
 const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
@@ -30,6 +37,9 @@ async function init() {
     console.warn(MOCK_FALLBACK_MESSAGE);
     route = PARIS_MOCK_ROUTE;
   }
+
+  console.log('Route loaded. Geometry points:', route.geometry.length);
+  console.log('First point:', route.geometry[0]);
 
   adapter.drawRoute(route.geometry, { color: '#8b5cf6', width: 6 });
   engine.setRoute(route.geometry);
@@ -49,11 +59,11 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   });
 
   if (state.snappedCoord) {
-    console.log('✅ Snapped to route:', state.snappedCoord);
+    console.log('✅ Snapped to route:', state.snappedCoord, 'Distance:', state.distanceToRoute);
     adapter.updateVehicle(state.snappedCoord, state.bearing, state);
     adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16 });
   } else {
-    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute);
+    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute, 'License:', state.licenseStatus);
   }
 
   const etaResult = eta.update(state);

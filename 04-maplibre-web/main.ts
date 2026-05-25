@@ -3,6 +3,13 @@ import { NavCore, OSRMDirectionsProvider, ETAEngine, VoiceTriggerEngine } from '
 import { MapLibreAdapter } from '@ingissa/navcore-maplibre';
 import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
+// Global error tracking
+window.onerror = (msg, url, line, col, error) => {
+  console.error('GLOBAL ERROR:', msg, 'at', line, ':', col, error);
+  alert('Error: ' + msg);
+  return false;
+};
+
 const ROUTE_WAYPOINTS: [number, number][] = [
   [2.3522, 48.8566],
   [2.3009, 48.8741],
@@ -21,12 +28,12 @@ const adapter = new MapLibreAdapter(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
 const engine = new NavCore({ 
   licenseKey: DEV_BYPASS_KEY,
-  baseCorridorMeters: 100 // Wider corridor for easier manual simulation
+  baseCorridorMeters: 500 // Extremely wide for debugging
 });
 const eta = new ETAEngine();
 const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 100 });
 
-const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
+const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
 
 async function init() {
   let route;
@@ -38,7 +45,10 @@ async function init() {
     route = PARIS_MOCK_ROUTE;
   }
 
-  map.on('load', () => {
+  const runAfterInit = () => {
+    console.log('Route loaded. Geometry points:', route.geometry.length);
+    console.log('First point:', route.geometry[0]);
+
     // 1. Draw the route line
     adapter.drawRoute(route.geometry, { color: '#6366f1', width: 6 });
     
@@ -51,7 +61,13 @@ async function init() {
     
     document.getElementById('status')!.textContent = 'Navigating';
     console.log('NavCore initialized successfully');
-  });
+  };
+
+  if (map.loaded()) {
+    runAfterInit();
+  } else {
+    map.on('load', runAfterInit);
+  }
 
   // Listen for instructions
   engine.on('instruction', (instr: any) => {
@@ -79,11 +95,11 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   });
 
   if (state.snappedCoord) {
-    console.log('✅ Snapped to route:', state.snappedCoord);
+    console.log('✅ Snapped to route:', state.snappedCoord, 'Distance:', state.distanceToRoute);
     adapter.updateVehicle(state.snappedCoord, state.bearing, state);
     adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16, pitch: 50 });
   } else {
-    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute);
+    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute, 'License:', state.licenseStatus);
   }
 
   const etaResult = eta.update(state);
