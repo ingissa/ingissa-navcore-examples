@@ -45,7 +45,7 @@ async function init() {
     engine.startNavigation();
     
     // 3. Sync voice instructions
-    voice.setInstructions(engine.getInstructions());
+    voice.setInstructions([...engine.getInstructions()]);
     
     document.getElementById('status')!.textContent = 'Navigating';
     console.log('NavCore initialized successfully');

@@ -15,8 +15,11 @@
     "@ingissa/navcore-core": "^1.0.4",
     "@ingissa/navcore-maplibre": "^1.0.4",
     "@ingissa/navcore-mapbox": "^1.0.4",
+    "@ingissa/navcore-leaflet": "^1.0.4",
     "@ingissa/navcore-headless": "^1.0.4",
     "@ingissa/navcore-simulator": "^1.0.4",
+    "leaflet": "^1.9.4",
+    "maplibre-gl": "^4.7.1",
     "tsx": "^4.0.0",
     "vite": "^5.0.0"
   }
