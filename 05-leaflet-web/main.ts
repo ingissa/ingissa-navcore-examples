@@ -17,7 +17,7 @@ const engine = new NavCore({
   baseCorridorMeters: 100 // Wider corridor for easier manual simulation
 });
 const eta = new ETAEngine();
-const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
+const provider = new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' });
 
 const WAYPOINTS: [number, number][] = [[2.3522, 48.8566], [2.3009, 48.8741]];
 
