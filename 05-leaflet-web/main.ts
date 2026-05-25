@@ -86,6 +86,41 @@ map.on('click', (e: any) => {
   updateState([e.latlng.lng, e.latlng.lat], 5, null, 8.33);
 });
 
+// Automated Simulation Logic
+function startSimulation() {
+  if (simInterval || currentRoute.length === 0) return;
+  
+  let idx = 0;
+  simInterval = setInterval(() => {
+    if (idx >= currentRoute.length) {
+      stopSimulation();
+      return;
+    }
+    
+    const current = currentRoute[idx];
+    const next = currentRoute[idx + 1] || current;
+    const bearing = getBearingBetweenPoints(current, next);
+    
+    updateState(current, 5, bearing, 13.8); // 50 km/h
+    idx++;
+  }, 500);
+  
+  document.getElementById('status')!.textContent = 'Simulating...';
+  document.getElementById('status')!.style.color = '#10b981';
+}
+
+function stopSimulation() {
+  if (simInterval) {
+    clearInterval(simInterval);
+    simInterval = null;
+  }
+  document.getElementById('status')!.textContent = 'Navigating (Static)';
+  document.getElementById('status')!.style.color = '#a78bfa';
+}
+
+document.getElementById('start-sim')!.addEventListener('click', startSimulation);
+document.getElementById('stop-sim')!.addEventListener('click', stopSimulation);
+
 // Watch Position
 navigator.geolocation.watchPosition(({ coords }) => {
   updateState(
