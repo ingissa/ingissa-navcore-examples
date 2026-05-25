@@ -81,6 +81,11 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   if (displayCoord) {
     adapter.updateVehicle(displayCoord, displayBearing, state);
     adapter.panCamera(displayCoord, displayBearing, { zoom: 16 });
+
+    // COURSE-UP ENHANCEMENT: Rotate map so vehicle heads Top
+    const mapEl = document.getElementById('map')!;
+    mapEl.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    mapEl.style.transform = `rotate(${-displayBearing}deg)`;
   }
 
   const etaResult = eta.update(state);
