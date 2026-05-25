@@ -11,7 +11,7 @@ const ROUTE_WAYPOINTS: [number, number][] = [
 // Initialize Map
 const map = new maplibregl.Map({
   container: 'map',
-  style: 'https://demotiles.maplibre.org/style.json',
+  style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
   center: ROUTE_WAYPOINTS[0],
   zoom: 14,
   pitch: 45,
@@ -19,7 +19,10 @@ const map = new maplibregl.Map({
 
 const adapter = new MapLibreAdapter(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
-const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
+const engine = new NavCore({ 
+  licenseKey: DEV_BYPASS_KEY,
+  baseCorridorMeters: 100 // Wider corridor for easier manual simulation
+});
 const eta = new ETAEngine();
 const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 100 });
 
@@ -76,8 +79,11 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   });
 
   if (state.snappedCoord) {
+    console.log('✅ Snapped to route:', state.snappedCoord);
     adapter.updateVehicle(state.snappedCoord, state.bearing, state);
     adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16, pitch: 50 });
+  } else {
+    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute);
   }
 
   const etaResult = eta.update(state);
@@ -93,7 +99,7 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
 }
 
 // WebContainer Simulation / Manual Clicking
-map.on('click', (e) => {
+map.on('click', (e: any) => {
   console.log('Manual position update:', [e.lngLat.lng, e.lngLat.lat]);
   updateState([e.lngLat.lng, e.lngLat.lat], 5, null, 8.33);
 });

@@ -12,7 +12,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const adapter = new LeafletAdapter(map);
 const DEV_BYPASS_KEY = 'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
-const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
+const engine = new NavCore({ 
+  licenseKey: DEV_BYPASS_KEY,
+  baseCorridorMeters: 100 // Wider corridor for easier manual simulation
+});
 const eta = new ETAEngine();
 const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
 
@@ -46,8 +49,11 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
   });
 
   if (state.snappedCoord) {
+    console.log('✅ Snapped to route:', state.snappedCoord);
     adapter.updateVehicle(state.snappedCoord, state.bearing, state);
     adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16 });
+  } else {
+    console.warn('❌ No snap at:', coord, 'Distance:', state.distanceToRoute);
   }
 
   const etaResult = eta.update(state);
@@ -64,7 +70,7 @@ function updateState(coord: [number, number], accuracy: number, bearing: number 
 }
 
 // Manual Click Simulation
-map.on('click', (e) => {
+map.on('click', (e: any) => {
   updateState([e.latlng.lng, e.latlng.lat], 5, null, 8.33);
 });
 
