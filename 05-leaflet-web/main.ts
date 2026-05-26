@@ -153,6 +153,11 @@ function stopSimulation() {
 document.getElementById('start-sim')!.addEventListener('click', startSimulation);
 document.getElementById('stop-sim')!.addEventListener('click', stopSimulation);
 
+// HUD Toggle Logic
+document.getElementById('hud-toggle')!.addEventListener('click', () => {
+  document.getElementById('hud')!.classList.toggle('collapsed');
+});
+
 // Watch Position
 navigator.geolocation.watchPosition(({ coords }) => {
   updateState(

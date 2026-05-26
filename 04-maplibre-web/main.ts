@@ -187,6 +187,11 @@ function stopSimulation() {
 document.getElementById('start-sim')!.addEventListener('click', startSimulation);
 document.getElementById('stop-sim')!.addEventListener('click', stopSimulation);
 
+// HUD Toggle Logic
+document.getElementById('hud-toggle')!.addEventListener('click', () => {
+  document.getElementById('hud')!.classList.toggle('collapsed');
+});
+
 // WebContainer Simulation / Manual Clicking
 map.on('click', (e: any) => {
   console.log('Manual position update:', [e.lngLat.lng, e.lngLat.lat]);
