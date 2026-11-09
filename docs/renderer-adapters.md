@@ -1,11 +1,17 @@
-# Renderer Adapters
+﻿# Map Rendering & Adapters Guide
 
-NavCore's engine outputs a `NavCoreState` on every tick. Renderer adapters translate that state into map library calls          drawing the route, moving the vehicle marker, and panning the camera.
+NavCore's engine produces an immutable `NavCoreState` snapshot on every tick. The SDK uses a Bring-Your-Own-Renderer (BYOR) model: applications map vehicle coordinates, bearings, and route lines directly to their preferred UI map component.
+
+---
 
 ## The `MapRendererAdapter` Interface
 
+For structured integrations, `@ingissa/navcore-core` exports the `MapRendererAdapter` interface:
+
 ```typescript
-interface MapRendererAdapter {
+import type { Coordinate, NavCoreState, RouteStyle, VehicleStyle, CameraOptions } from '@ingissa/navcore-core';
+
+export interface MapRendererAdapter {
   updateVehicle(coord: Coordinate, bearing: number, state: NavCoreState, style?: VehicleStyle): void;
   drawRoute(coords: Coordinate[], style?: RouteStyle): void;
   clearRoute(): void;
@@ -16,168 +22,120 @@ interface MapRendererAdapter {
 
 ---
 
-## `HeadlessAdapter`          Node.js / CI / Testing
+## 1.0.9 Ecosystem Rendering Status
 
-No map library required. Records all state for assertions.
-
-```typescript
-import { HeadlessAdapter } from '@ingissa/navcore-headless';
-
-const adapter = new HeadlessAdapter();
-adapter.drawRoute(route.geometry);
-
-// Feed state on every tick
-engine.on('update', (state) => {
-  if (state.snappedCoord) adapter.updateVehicle(state.snappedCoord, state.bearing, state);
-});
-
-// Run simulation ... then assert
-adapter.assertReached([2.347, 48.859], 20);   // within 20m
-adapter.assertArrived();
-adapter.assertNeverOffRoute();
-
-console.log(`Recorded ${adapter.getHistory().length} positions`);
-```
+> [!IMPORTANT]
+> **Notice on Legacy Adapter Packages:**
+> Early experimental packages (`@ingissa/navcore-maplibre`, `@ingissa/navcore-leaflet`, `@ingissa/navcore-google-maps`, and `@ingissa/navcore-headless`) are **private** and not published in the 1.0.9 release.
+>
+> In modern NavCore applications, rendering is implemented directly in userland by consuming state from `nav.update()` or `useNavSelector()`, avoiding external wrapper overhead.
 
 ---
 
-## `MapLibreAdapter`          MapLibre GL JS
+## Direct Rendering Examples
 
-```bash
-npm install maplibre-gl @ingissa/navcore-maplibre
-```
+### React Native Maps (`react-native-maps`)
 
-```typescript
-import maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { MapLibreAdapter } from '@ingissa/navcore-maplibre';
+```tsx
+import React, { useRef } from 'react';
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import { useNavSelector } from '@ingissa/navcore-react-native';
 
-const map = new maplibregl.Map({
-  container: 'map',
-  style: 'https://demotiles.maplibre.org/style.json',
-  center: [2.35, 48.86],
-  zoom: 13,
-});
+export function NavigationMap({ routeGeometry }) {
+  const snappedCoord = useNavSelector((s) => s.snappedCoord);
+  const bearing = useNavSelector((s) => s.bearing);
 
-const adapter = new MapLibreAdapter(map, {
-  vehicleHtml: '<div class="my-vehicle-icon">         </div>',  // optional custom icon
-});
-
-map.on('load', () => {
-  // Draw route
-  adapter.drawRoute(routeGeometry, { color: '#7c3aed', width: 5 });
-});
-
-// On every engine tick
-engine.on('update', (state) => {
-  if (!state.snappedCoord) return;
-  adapter.updateVehicle(state.snappedCoord, state.bearing, state);
-  adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 15, pitch: 45 });
-});
-
-// Cleanup
-window.addEventListener('beforeunload', () => adapter.destroy());
-```
-
-### Route Style Options
-
-```typescript
-interface RouteStyle {
-  color?: string;        // CSS color (default: '#7c3aed')
-  width?: number;        // pixels (default: 4)
-  opacity?: number;      // 0        1 (default: 0.9)
-  dashArray?: number[];  // e.g. [8, 4] for dashed line
+  return (
+    <MapView
+      style={{ flex: 1 }}
+      initialRegion={{
+        latitude: routeGeometry[0][1],
+        longitude: routeGeometry[0][0],
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      }}
+    >
+      <Polyline
+        coordinates={routeGeometry.map(([longitude, latitude]) => ({ latitude, longitude }))}
+        strokeColor="#3b82f6"
+        strokeWidth={5}
+      />
+      {snappedCoord && (
+        <Marker
+          coordinate={{ latitude: snappedCoord[1], longitude: snappedCoord[0] }}
+          rotation={bearing}
+          flat
+          anchor={{ x: 0.5, y: 0.5 }}
+        />
+      )}
+    </MapView>
+  );
 }
 ```
 
 ---
 
-## `LeafletAdapter`          Leaflet.js
-
-```bash
-npm install leaflet @ingissa/navcore-leaflet
-# TypeScript: npm install -D @types/leaflet
-```
+### Web Browser with MapLibre GL JS
 
 ```typescript
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { LeafletAdapter } from '@ingissa/navcore-leaflet';
+import maplibregl from 'maplibre-gl';
+import type { RoutePlan, NavCoreState } from '@ingissa/navcore-core';
 
-const map = L.map('map').setView([48.86, 2.35], 14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '     OpenStreetMap contributors',
-}).addTo(map);
+export class WebMapLibreRenderer {
+  private map: maplibregl.Map;
+  private marker: maplibregl.Marker;
 
-const adapter = new LeafletAdapter(map);
+  constructor(containerId: string, styleUrl: string) {
+    this.map = new maplibregl.Map({
+      container: containerId,
+      style: styleUrl,
+      center: [2.35, 48.86],
+      zoom: 14,
+    });
 
-adapter.drawRoute(routeGeometry, { color: '#7c3aed', width: 4 });
-
-engine.on('update', (state) => {
-  if (!state.snappedCoord) return;
-  adapter.updateVehicle(state.snappedCoord, state.bearing, state);
-  adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 15 });
-});
-```
-
-> **Note:** Leaflet does not support map rotation natively. The vehicle marker rotates via CSS transform, but the map background stays north-up. Use MapLibre for full map rotation.
-
----
-
-## `GoogleMapsAdapter`          Google Maps JS API v3
-
-```html
-<!-- In your HTML (replace YOUR_KEY) -->
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
-```
-
-```typescript
-import { GoogleMapsAdapter } from '@ingissa/navcore-google-maps';
-
-const map = new google.maps.Map(document.getElementById('map')!, {
-  center: { lat: 48.86, lng: 2.35 },
-  zoom: 14,
-});
-
-const adapter = new GoogleMapsAdapter(map, { vehicleIconScale: 1.2 });
-
-adapter.drawRoute(routeGeometry, { color: '#7c3aed', width: 4 });
-
-engine.on('update', (state) => {
-  if (!state.snappedCoord) return;
-  adapter.updateVehicle(state.snappedCoord, state.bearing, state);
-  adapter.panCamera(state.snappedCoord, state.bearing, { zoom: 16 });
-});
-```
-
-> **Note:** Google Maps v3 doesn't natively rotate the map view. For bearing-aware map rotation, use MapLibre or the Maps 3D API.
-
----
-
-## Writing a Custom Adapter
-
-```typescript
-import type { MapRendererAdapter, RouteStyle, VehicleStyle, CameraOptions } from '@ingissa/navcore-core';
-import type { Coordinate, NavCoreState } from '@ingissa/navcore-core';
-
-export class MyMapAdapter implements MapRendererAdapter {
-  constructor(private readonly myMap: MyMap) {}
-
-  updateVehicle(coord: Coordinate, bearing: number, _state: NavCoreState): void {
-    this.myMap.setMarkerPosition(coord[1], coord[0]);
-    this.myMap.setMarkerRotation(bearing);
+    const el = document.createElement('div');
+    el.className = 'navcore-vehicle-marker';
+    el.innerHTML = '🚗';
+    this.marker = new maplibregl.Marker({ element: el }).setLngLat([2.35, 48.86]).addTo(this.map);
   }
 
-  drawRoute(coords: Coordinate[], style?: RouteStyle): void {
-    this.myMap.drawPolyline(coords, style?.color ?? '#7c3aed');
+  drawRoute(plan: RoutePlan) {
+    this.map.on('load', () => {
+      this.map.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: plan.geometry as number[][],
+          },
+        },
+      });
+
+      this.map.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: { 'line-color': '#3b82f6', 'line-width': 5 },
+      });
+    });
   }
 
-  clearRoute(): void { this.myMap.clearPolyline(); }
-
-  panCamera(coord: Coordinate, bearing: number): void {
-    this.myMap.flyTo({ center: coord, bearing });
+  update(state: NavCoreState) {
+    if (!state.snappedCoord) return;
+    this.marker.setLngLat([state.snappedCoord[0], state.snappedCoord[1]]);
+    this.map.easeTo({
+      center: [state.snappedCoord[0], state.snappedCoord[1]],
+      bearing: state.bearing,
+      duration: 500,
+    });
   }
 
-  destroy(): void { this.myMap.removeAllLayers(); }
+  destroy() {
+    this.marker.remove();
+    this.map.remove();
+  }
 }
 ```

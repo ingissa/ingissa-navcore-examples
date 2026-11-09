@@ -1,5 +1,5 @@
-/**
- * Example 07 - Voice Trigger Engine
+﻿/**
+ * Example 07 â€” Voice Trigger Engine
  *
  * Demonstrates:
  * - VoiceTriggerEngine with speed-adaptive trigger windows
@@ -18,20 +18,10 @@ import {
   InstructionEditor,
   OSRMDirectionsProvider,
 } from '@ingissa/navcore-core';
-import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
-  
-  let route;
-  try {
-    console.log('Fetching route from OSRM...');
-    route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
-  } catch {
-    console.log(MOCK_FALLBACK_MESSAGE);
-    route = PARIS_MOCK_ROUTE;
-  }
-  
+  const route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
   const geometry = route.geometry;
 
   // Build instructions
@@ -58,10 +48,7 @@ async function main() {
   voice.setInstructions(instructions);
 
   // Create nav engine
-  const DEV_BYPASS_KEY =
-    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
-
-  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
+  const engine = new NavCore({ isDev: true });
   engine.setRoute(geometry, instructions);
   engine.startNavigation();
 
@@ -83,7 +70,7 @@ async function main() {
     if (cue) {
       triggeredCues.push(cue.text);
       const distStr = cue.distanceMetres.toFixed(0).padStart(4);
-      console.log(`      [${distStr}m, ${cue.priority.padEnd(6)}] "${cue.text}"`);
+      console.log(`  ðŸ—£  [${distStr}m, ${cue.priority.padEnd(6)}] "${cue.text}"`);
     }
 
     if (state.hasArrived) break;

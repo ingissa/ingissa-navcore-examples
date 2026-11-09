@@ -1,29 +1,38 @@
 {
   "name": "ingissa-navcore-examples",
-  "version": "1.0.0",
-  "description": "Interactive examples for NavCore SDK",
-  "main": "01-basic-navigation/index.ts",
+  "version": "1.0.11",
+  "private": true,
+  "description": "Runnable code examples, integration guides, and documentation for the NavCore SDK.",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "start": "tsx 01-basic-navigation/index.ts",
     "start:01": "tsx 01-basic-navigation/index.ts",
     "start:02": "tsx 02-custom-route-builder/index.ts",
+    "start:03": "tsx 03-instruction-editor/index.ts",
+    "start:06": "tsx 06-directions-providers/index.ts",
+    "start:07": "tsx 07-voice-triggers/index.ts",
+    "start:08": "tsx 08-eta-engine/index.ts",
+    "start:09": "tsx 09-geofencing/index.ts",
+    "start:10": "tsx 10-parallel-road-resolver/index.ts",
+    "start:11": "tsx 11-headless-testing/index.ts",
     "dev": "vite",
     "dev:04": "vite --open 04-maplibre-web/index.html",
     "dev:05": "vite --open 05-leaflet-web/index.html"
   },
   "dependencies": {
-    "@ingissa/navcore-core": "^1.0.4",
-    "@ingissa/navcore-maplibre": "^1.0.4",
-    "@ingissa/navcore-mapbox": "^1.0.4",
-    "@ingissa/navcore-leaflet": "^1.0.4",
-    "@ingissa/navcore-headless": "^1.0.4",
-    "@ingissa/navcore-simulator": "^1.0.4",
+    "@ingissa/navcore-core": "^1.0.11",
+    "@ingissa/navcore-mapbox": "^1.0.11",
+    "@ingissa/navcore-react-native": "^1.0.11",
+    "@ingissa/navcore-simulator": "^1.0.11",
+    "@ingissa/navcore-types": "^1.0.11",
     "leaflet": "^1.9.4",
-    "maplibre-gl": "^4.7.1",
-    "tsx": "^4.0.0",
-    "vite": "^5.0.0"
+    "maplibre-gl": "^4.7.1"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.12"
+    "@types/leaflet": "^1.9.12",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.0",
+    "vite": "^5.0.0"
   }
 }

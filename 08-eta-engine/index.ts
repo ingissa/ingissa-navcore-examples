@@ -1,5 +1,5 @@
-/**
- * Example 08 - ETA Engine
+﻿/**
+ * Example 08 â€” ETA Engine
  *
  * Demonstrates:
  * - ETAEngine with rolling speed average
@@ -15,41 +15,31 @@ import {
   ETAEngine,
   OSRMDirectionsProvider,
 } from '@ingissa/navcore-core';
-import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
-  
-  let route;
-  try {
-    console.log('Fetching route from OSRM...');
-    route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
-  } catch {
-    console.log(MOCK_FALLBACK_MESSAGE);
-    route = PARIS_MOCK_ROUTE;
-  }
-  
+  const route = await provider.getRoute([[2.3522, 48.8566], [2.3009, 48.8741]]);
   const geometry = route.geometry;
 
   console.log(`Route: ${(route.distance / 1000).toFixed(2)}km`);
   console.log(`OSRM estimate: ${Math.round(route.duration / 60)} min\n`);
 
-  // -- Scenario 1: Constant speed --------------------------------------------
+  // â”€â”€ Scenario 1: Constant speed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('=== Scenario 1: Constant 30 km/h ===\n');
-  await runSimulation(geometry as [number, number][], () => 8.33); // 30 km/h
+  await runSimulation(geometry, () => 8.33); // 30 km/h
 
-  // -- Scenario 2: Variable speed --------------------------------------------
+  // â”€â”€ Scenario 2: Variable speed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('\n=== Scenario 2: Variable speed (traffic) ===\n');
-  await runSimulation(geometry as [number, number][], (i, total) => {
+  await runSimulation(geometry, (i, total) => {
     // Slow down in the middle (simulate traffic)
     const progress = i / total;
     if (progress > 0.3 && progress < 0.7) return 2.0; // ~7 km/h
     return 11.1; // ~40 km/h
   });
 
-  // -- Scenario 3: With stops ------------------------------------------------
+  // â”€â”€ Scenario 3: With stops â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('\n=== Scenario 3: With stop at red light ===\n');
-  await runSimulation(geometry as [number, number][], (i, total) => {
+  await runSimulation(geometry, (i, total) => {
     const progress = i / total;
     if (progress > 0.45 && progress < 0.55) return 0; // stopped
     return 8.33;
@@ -60,16 +50,14 @@ async function runSimulation(
   geometry: [number, number][],
   speedFn: (i: number, total: number) => number
 ) {
-  const DEV_BYPASS_KEY =
-    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
-
-  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
+  const engine = new NavCore({ isDev: true });
   const eta = new ETAEngine({ speedWindowSize: 5 });
 
   engine.setRoute(geometry);
   engine.startNavigation();
 
   const printInterval = Math.floor(geometry.length / 8);
+  let lastEtaSeconds = 0;
 
   for (let i = 0; i < geometry.length; i++) {
     const speed = speedFn(i, geometry.length);
@@ -87,7 +75,7 @@ async function runSimulation(
       const distKm = ((state.distanceToDestination ?? 0) / 1000).toFixed(2);
       const etaMin = result.isReliable ? Math.ceil(result.etaSeconds / 60) : '?';
       const speedKmh = (result.averageSpeedMs * 3.6).toFixed(0);
-      const reliable = result.isReliable ? ' ' : ' ';
+      const reliable = result.isReliable ? 'âœ…' : 'â³';
 
       console.log(
         `  ${reliable} dist=${distKm}km  ` +
@@ -95,10 +83,12 @@ async function runSimulation(
         `eta=${etaMin}min  ` +
         `(raw=${result.etaSeconds}s)`
       );
+
+      lastEtaSeconds = result.etaSeconds;
     }
 
     if (state.hasArrived) {
-      console.log('     Arrived!');
+      console.log('  ðŸ Arrived!');
       break;
     }
   }

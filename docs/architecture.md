@@ -1,171 +1,73 @@
-# Architecture
+﻿# Architecture Overview
 
-## The 11-Stage Navigation Pipeline
-
-Every call to `engine.update(gps)` runs this pipeline in order:
-
-```
-GPS Input
-           
-          
-1. Kalman Filter (noise smoothing)
-             KalmanFilter2D          smooths noisy GPS coordinates using Q/R noise matrices
-          
-2. Route Snapper (map matching)
-             RouteSnapper          projects filtered coord onto nearest route segment
-                     Bearing penalty          U-turn protection (FEATURE: U_TURN_PROTECTION)
-                     Inertia penalty          anti-oscillation between segments
-          
-3. Dynamic Corridor (tolerance zone)
-             calculateDynamicCorridor          widens corridor at high speed / low accuracy
-          
-4. Progress Validation (monotonic advance)
-             validateProgressUpdate          rejects backwards jumps > MAX_SNAP_DISTANCE
-          
-5. Linear Offset Update (dead reckoning prep)
-             applyGpsCorrection          blends measured route offset with predicted offset
-          
-6. Bearing Smoothing (if ADVANCED_BEARING licensed)
-             applyBearingSmoothing          blends GPS bearing + route-derived bearing
-          
-7. Deviation Detection (off-route FSM)
-             DeviationDetector          OffRouteFSM transitions:
-             ON_ROUTE          DEVIATING          OFF_ROUTE          REJOINING
-          
-8. Lifecycle Join Detection
-             NavigationFSM: APPROACHING_ROUTE          NAVIGATING
-          
-9. Instruction Resolution (speed-adaptive trigger)
-             resolveNextInstruction          fires when within trigger window of next maneuver
-          
-10. Arrival Detection
-              haversineDistance to destination < arrivalThresholdMeters
-           
-11. Dead Reckoning anchor update (if DEAD_RECKONING licensed)
-              DeadReckoningEngine          predicts position between GPS updates
-           
-NavCoreState (snapshot of all state)
-```
+This document provides a architectural reference for the NavCore SDK pipeline, module structure, and tuning constants. For visual flowcharts and state diagrams, see [Architecture & Pipeline Concepts](./concepts.md).
 
 ---
 
-## Module Map
+## 11-Stage Pipeline Summary
 
-```
-@ingissa/navcore-core/src/
-                        NavCore.ts                       Main orchestrator (the 11 stages above)
-                        features.ts                      Feature flag constants
-                        constants.ts                     Tunable thresholds
-        
-                        geo/
-                                   haversine.ts                 Distance, bearing, destination point
-                                   bearing.ts                   Angle normalization, interpolation
-                                   projection.ts                Point-on-segment projection
-                                    cumulative.ts                Cumulative distance arrays (forward + reverse)
-        
-                        kalman/
-                                    KalmanFilter2D.ts            2D Kalman filter for GPS smoothing
-        
-                        snapper/
-                                   RouteSnapper.ts              Stage 2          map matching with penalties
-                                    ParallelRoadResolver.ts         Standalone parallel road / U-turn API [P0]
-        
-                        corridor/
-                                   DynamicCorridor.ts           Stage 3          speed/accuracy-adaptive width
-                                    DeviationDetector.ts         Stage 7          compound deviation signals
-        
-                        bearing/
-                                    BearingEngine.ts             Stage 6          smoothing, blending, speed-adaptive     
-        
-                        progress/
-                                   ProgressTracker.ts           Stage 4          monotonic index validation
-                                   InstructionResolver.ts         Stage 9          proximity + bearing gate trigger
-                                    InstructionEditor.ts         Fluent instruction builder [P0]
-        
-                        predictor/
-                                    RouteOffsetPredictor.ts         Stage 5          linear offset advance + GPS correction
-        
-                        dead-reckoning/
-                                    DeadReckoning.ts             Stage 11          dead reckoning between GPS fixes
-        
-                        off-route/
-                                   NavigationFSM.ts             Lifecycle FSM (IDLE          NAVIGATING          FINISHED)
-                                    OffRouteFSM.ts               Off-route FSM (ON_ROUTE          DEVIATING          OFF_ROUTE)
-        
-                        route-builder/
-                                    CustomRouteBuilder.ts         Waypoint management, GPX/GeoJSON import/export
-        
-                        directions/
-                                   DirectionsProvider.ts            Generic interface [P2]
-                                   OSRMDirectionsProvider.ts         Self-hosted OSRM [P2]
-                                   ValhallaDirectionsProvider.ts         Self-hosted Valhalla [P2]
-                                    OpenRouteServiceProvider.ts         ORS API [P2]
-        
-                        renderer/
-                                    MapRendererAdapter.ts         Generic renderer interface [P1]
-        
-                        voice/
-                                    VoiceTriggerEngine.ts         TTS timing + deduplication [P3]
-        
-                        eta/
-                                    ETAEngine.ts                  Offline ETA computation [P3]
-        
-                        geofencing/
-                                    GeofencingEngine.ts           Circle + polygon zones [P3]
-        
-                         license/
-                             LicenseManager.ts             Feature flag validation
+On every GPS fix fed to `engine.update(gps)`, NavCore executes 11 deterministic processing stages:
 
-@ingissa/navcore-headless/           Renderer: in-memory, CI/testing
-@ingissa/navcore-maplibre/           Renderer: MapLibre GL JS
-@ingissa/navcore-leaflet/            Renderer: Leaflet.js
-@ingissa/navcore-google-maps/         Renderer: Google Maps JS API
-@ingissa/navcore-mapbox/             Directions: Mapbox Directions API
-@ingissa/navcore-simulator/          GPS simulation engine for testing
-```
+1. **Kalman Filtering (`KalmanFilter2D`)**: Coordinate noise reduction operating directly in angular degrees.
+2. **Route Snapping (`RouteSnapper`)**: Nearest projection with bearing penalties (U-turn anti-snap) and inertia penalties (anti-oscillation).
+3. **Dynamic Corridor (`calculateDynamicCorridor`)**: Dynamic corridor sizing based on speed, accuracy, and turn anticipation.
+4. **Progress Validation (`validateProgressUpdate`)**: Monotonic forward progress validation along route indices.
+5. **Linear Offset Prediction (`applyGpsCorrection`)**: Interpolates sub-segment distance along route geometry with beta correction.
+6. **Bearing Engine (`applyBearingSmoothing`)**: Exponential moving average heading smoothing with lookahead.
+7. **Deviation Detection (`DeviationDetector` & `OffRouteFSM`)**: Compound deviation checks (lateral distance, heading divergence, and movement away).
+8. **Lifecycle Synchronization (`NavigationFSM`)**: Manages navigation lifecycle states (`IDLE`, `OVERVIEW`, `APPROACHING_ROUTE`, `ON_ROUTE`).
+9. **Instruction Resolution (`resolveNextInstruction`)**: Proximity and bearing gate triggering for upcoming maneuvers.
+10. **Arrival Detection**: Haversine distance threshold evaluation at route destination.
+11. **Dead Reckoning (`DeadReckoningEngine`)**: Positional extrapolation during temporary signal dropouts.
 
 ---
 
-## State Machine Overview
+## Verified Engine Constants
 
-### Lifecycle FSM (`NavigationFSM`)
+All constants are centralized in [`packages/core/src/constants.ts`](file:///E:/WORKSPACE/expo_projects/navcore-sdk/packages/core/src/constants.ts):
 
-```
-IDLE                 ROUTE_LOADED                        ROUTE_LOADED                 USER_START                        APPROACHING_ROUTE
-                                                                  
-                                                   ROUTE_JOINED
-                                                                  
-                                                                 
-                                                    NAVIGATING                 NAVIGATION_FINISHED                        FINISHED
-                                                                  
-                                                   GPS_LOST / RECOVERED
-```
-
-### Off-Route FSM (`OffRouteFSM`)
-
-```
-ON_ROUTE                 DEVIATION_SUSPECTED                        DEVIATING                 DEVIATION_CONFIRMED                        OFF_ROUTE
-                                                                                               
-                                                                                            RESUME                                                                                                                                                                    REROUTE_STARTED              
-                                                                                         
-                                                                                        
-                                                    REJOINING                                                                                                        
-```
+| Parameter | Symbol | Default Value | Description |
+|---|---|---|---|
+| Base Corridor | `BASE_CORRIDOR_METERS` | `25` m | Minimum corridor width at low speed |
+| Maximum Corridor | `MAX_CORRIDOR_METERS` | `60` m | Maximum allowable corridor width |
+| Speed Corridor Factor | `SPEED_CORRIDOR_FACTOR` | `1.2` | Multiplier applied to vehicle speed in m/s |
+| GPS Accuracy Factor | `GPS_ACCURACY_FACTOR` | `0.5` | Multiplier applied to reported horizontal accuracy |
+| Turn Corridor Multiplier| `TURN_CORRIDOR_MULTIPLIER` | `1.4` | Expansion multiplier applied near upcoming turns |
+| Turn Lookahead Distance | `TURN_LOOKAHEAD_DISTANCE_METERS` | `40` m | Proximity window triggering turn corridor expansion |
+| Maximum Snap Distance | `MAX_SNAP_DISTANCE` | `80` m | Distance threshold past which fixes are skipped |
+| Snap Search Window | `SNAP_WINDOW_SIZE` | `25` segments | Forward search segment window |
+| Bearing Mismatch Angle | `BEARING_MISMATCH_THRESHOLD` | `90°` | Delta angle threshold triggering U-turn penalty |
+| Bearing Mismatch Penalty | `BEARING_MISMATCH_PENALTY` | `500` score | Score penalty added for reverse-direction segments |
+| Inertia Penalty | `INERTIA_PENALTY` | `200` score | Score penalty added for distant forward segments |
+| Inertia Segment Distance| `INERTIA_SEGMENT_DIST` | `5` segments | Segment delta threshold triggering inertia penalty |
+| Bearing Smoothing Alpha | `BEARING_SMOOTHING_ALPHA` | `0.3` | Exponential moving average smoothing weight |
+| Bearing Minimum Speed | `BEARING_MIN_SPEED_MPS` | `1.5` m/s | Minimum speed required to trust GPS bearing |
+| Bearing Alignment Gate | `BEARING_ALIGNMENT_THRESHOLD` | `55°` | Heading alignment threshold |
+| Arrival Radius | `ARRIVAL_THRESHOLD_METERS` | `30` m | Destination proximity triggering arrival |
+| Dead Reckoning Max Age | `DR_MAX_AGE_MS` | `5000` ms | Maximum extrapolation duration without GPS |
+| Deviation Confirmation | `OFF_ROUTE_CONFIRM_MS` | `2000` ms | Dwell duration in `DEVIATING` before `OFF_ROUTE` |
+| Rejoin Confirmation | `REJOIN_CONFIRM_MS` | `1500` ms | Time required to confirm route re-entry |
+| Rejoin Cooldown | `REJOIN_COOLDOWN_MS` | `12000` ms | Suppression cooldown between successive rejoins |
+| GPS Stale Threshold | `GPS_STALE_MS` | `3000` ms | Age above which GPS fix is marked stale |
+| Linear Beta Correction | `BETA_CORRECTION` | `0.15` | GPS blending ratio for route offset |
 
 ---
 
-## Key Constants
+## State Machines
 
-Located in `core/src/constants.ts`. Override via `NavCoreOptions`:
+### 1. `NavigationFSM` (Lifecycle)
+Valid states defined in `packages/core/src/off-route/NavigationFSM.ts`:
+- `IDLE`: Initial state or post-arrival reset.
+- `OVERVIEW`: Route loaded and ready.
+- `APPROACHING_ROUTE`: Navigation started; vehicle moving toward route start.
+- `ON_ROUTE`: Vehicle has joined the route geometry and active guidance is running.
 
-| Constant | Default | Description |
-|---|---|---|
-| `BASE_CORRIDOR_METERS` | 25m | Off-route detection radius at slow speed |
-| `MAX_CORRIDOR_METERS` | 80m | Max corridor at high speed / low accuracy |
-| `ARRIVAL_THRESHOLD_METERS` | 15m | Distance to destination that triggers arrival |
-| `BEARING_MISMATCH_THRESHOLD` | 60     | Bearing delta that triggers U-turn penalty |
-| `BEARING_MISMATCH_PENALTY` | 80m | Score penalty added for U-turn mismatch |
-| `MAX_SNAP_DISTANCE` | 150m | Hard cutoff for snapping |
-| `SNAP_WINDOW_SIZE` | 20 | Number of route segments to search ahead |
-| `GPS_STALE_MS` | 5000ms | GPS age above which `isGpsStale` is true |
-| `BETA_CORRECTION` | 0.3 | Blend factor for GPS correction of linear offset |
+### 2. `OffRouteFSM` (Deviation & Recovery)
+Valid states defined in `packages/core/src/off-route/OffRouteFSM.ts`:
+- `ON_ROUTE`: Traversing the route within corridor bounds.
+- `DEVIATING`: Departure suspected; confirmation timer running.
+- `OFF_ROUTE`: Departure confirmed after 2000ms.
+- `REROUTING`: Alternate path request in progress.
+- `REJOINING`: Following temporary route back to main line.
+- `REJOINED`: Re-entered valid corridor (dwell threshold met).
+- `FAILED`: Reroute computation failure.

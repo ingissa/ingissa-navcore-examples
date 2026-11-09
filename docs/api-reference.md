@@ -1,289 +1,57 @@
-# API Reference
+﻿# NavCore SDK API Reference
 
-## `NavCore`          Main Engine
+Welcome to the NavCore SDK API documentation. For detailed, per-package symbol references, see the [API Reference Directory](./api-reference/README.md).
 
-### Constructor Options (`NavCoreOptions`)
+---
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `licenseKey` | `string` | `''` | Commercial license key |
-| `isDev` | `boolean` | `false` | Dev mode (all features unlocked) |
-| `isCircuit` | `boolean` | `false` | Closed-loop route |
-| `kalmanQ` | `number` | `0.00001` | Process noise (lower = smoother) |
-| `kalmanRBase` | `number` | `0.00005` | Measurement noise base |
-| `baseCorridorMeters` | `number` | `25` | Corridor at low speed |
-| `maxCorridorMeters` | `number` | `80` | Corridor at high speed/low accuracy |
-| `arrivalThresholdMeters` | `number` | `15` | Arrival detection radius |
-| `bearingSmoothingAlpha` | `number` | `0.3` | Bearing EMA (0=no smooth, 1=instant) |
+## Package Directory
 
-### Methods
-
-```typescript
-engine.setRoute(route: Coordinate[], instructions?: NavInstruction[]): void
-engine.startNavigation(): void
-engine.update(gps: NavGpsUpdate): NavCoreState   // main tick          runs all 11 stages
-engine.tick(nowMs: number): NavCoreState           // dead-reckoning advance (call at RAF)
-engine.getState(): NavCoreState
-engine.destroy(): void
-engine.on(event, handler): void
-engine.off(event, handler): void
-```
-
-### Events
-
-| Event | Payload | When |
+| Package | Scope | Reference Document |
 |---|---|---|
-| `routeLoaded` | `{ routeLength }` | `setRoute()` called |
-| `navigationStarted` |          | `startNavigation()` called |
-| `instruction` | `NavInstruction` | Instruction enters trigger window |
-| `arrival` |          | Destination reached |
-| `deviation` | `{ anchorIndex, ghostCoord }` | Off-route confirmed |
-
-### `NavGpsUpdate`
-
-```typescript
-interface NavGpsUpdate {
-  coord: Coordinate;       // [lng, lat]
-  accuracy: number | null; // metres (null = unknown)
-  bearing: number | null;  // degrees (null = unknown)
-  speed: number;           // m/s
-  timestamp: number;       // Date.now()
-}
-```
-
-### `NavCoreState`
-
-```typescript
-interface NavCoreState {
-  snappedCoord: Coordinate | null;
-  rawGpsCoord: Coordinate | null;
-  bearing: number;
-  routeIndex: number;
-  distanceToRoute: number;
-  corridor: number;
-  isOffRoute: boolean;
-  hasArrived: boolean;
-  offRouteState: string;
-  lifecycleState: string;
-  distanceToDestination: number | null;
-  distanceToNextInstruction: number | null;
-  nextInstructionIndex: number | null;
-  currentSpeed: number;
-  isGpsStale: boolean;
-  gpsAgeMs: number;
-}
-```
+| [`@ingissa/navcore-core`](./api-reference/navcore-core.md) | Navigation engine, Kalman filter, snapper, FSMs, route planning, dead reckoning, and built-in directions providers. Subpaths: `.`, `./core`, `./pro`. | [Core API Reference](./api-reference/navcore-core.md) |
+| [`@ingissa/navcore-react-native`](./api-reference/navcore-react-native.md) | React Native bindings, context provider (`NavCoreProvider`), and granular state selector hooks (`useNavSelector`, `useNavInstruction`, etc.). | [React Native API Reference](./api-reference/navcore-react-native.md) |
+| [`@ingissa/navcore-simulator`](./api-reference/navcore-simulator.md) | Headless GPS simulation engine, noise models, scenario injection, and React Native UI controls. Subpaths: `.`, `./node`, `./react-native`. | [Simulator API Reference](./api-reference/navcore-simulator.md) |
+| [`@ingissa/navcore-mapbox`](./api-reference/navcore-mapbox.md) | Mapbox Directions API provider adapter with automatic waypoint chunking. | [Mapbox API Reference](./api-reference/navcore-mapbox.md) |
+| [`@ingissa/navcore-types`](./api-reference/navcore-types.md) | Shared domain interfaces and type definitions used across the ecosystem. | [Types API Reference](./api-reference/navcore-types.md) |
 
 ---
 
-## `CustomRouteBuilder`
+## Quick Reference: Primary Integration APIs
 
+### `NavigationSession`
 ```typescript
-const builder = new CustomRouteBuilder();
-builder.addWaypoint([lng, lat], { name?: string, silent?: boolean })  //          id
-builder.insertWaypoint(coord, afterId)   //          id
-builder.removeWaypoint(id)
-builder.moveWaypoint(id, newCoord)
-builder.getWaypoints()                   //          ReadonlyArray<CustomWaypoint>
-builder.chunk('OVERLAP_1', 25)           //          Coordinate[][]
-builder.buildStraightLine()              //          { geometry, waypoints }
-builder.fromGPX(gpxString)
-builder.toGPX()                          //          string
-builder.fromGeoJSON(geojson)
-builder.toGeoJSON()                      //          FeatureCollection
-builder.clear()
-builder.size                             // number
-```
+import { createNavigationSession, OSRMDirectionsProvider } from '@ingissa/navcore-core';
 
----
-
-## `InstructionEditor`
-
-```typescript
-const editor = new InstructionEditor();
-editor.addTurn([lng,lat], 'Turn left', 42)
-editor.addExamPoint([lng,lat], 'Check mirrors', 50, { severity: 'warning' })
-editor.addCheckpoint([lng,lat], 65)
-editor.addDepart([lng,lat])
-editor.addArrive([lng,lat])
-editor.update(id, patch)
-editor.remove(id)
-editor.sort()
-editor.attachToCumulative(route)   // auto-compute cumulativeOffset + bearings
-editor.toArray()                   //          NavInstruction[] (use with setRoute)
-editor.toRichArray()               //          RichInstruction[] (with type/severity/meta)
-editor.size                        // number
-```
-
----
-
-## Directions Providers
-
-All implement `DirectionsProvider`:
-```typescript
-interface DirectionsProvider {
-  getRoute(waypoints: Coordinate[], opts?: DirectionsOptions): Promise<DirectionsResult>
-}
-```
-
-| Provider | Import | Key config |
-|---|---|---|
-| `MapboxDirectionsProvider` | `@ingissa/navcore-mapbox` | `accessToken` |
-| `OSRMDirectionsProvider` | `@ingissa/navcore-core` | `baseUrl` |
-| `ValhallaDirectionsProvider` | `@ingissa/navcore-core` | `baseUrl`, `costing` |
-| `OpenRouteServiceProvider` | `@ingissa/navcore-core` | `apiKey` |
-
-```typescript
-interface DirectionsResult {
-  geometry: Coordinate[];
-  distance: number;   // metres
-  duration: number;   // seconds
-  legs: DirectionsLeg[];
-  raw?: unknown;
-}
-```
-
----
-
-## Renderer Adapters
-
-All implement `MapRendererAdapter`:
-```typescript
-interface MapRendererAdapter {
-  updateVehicle(coord, bearing, state, style?): void
-  drawRoute(coords, style?): void
-  clearRoute(): void
-  panCamera(coord, bearing, options?): void
-  destroy(): void
-}
-```
-
-| Adapter | Package | Peer dep |
-|---|---|---|
-| `HeadlessAdapter` | `@ingissa/navcore-headless` | none |
-| `MapLibreAdapter` | `@ingissa/navcore-maplibre` | maplibre-gl        3 |
-| `LeafletAdapter` | `@ingissa/navcore-leaflet` | leaflet        1.9 |
-| `GoogleMapsAdapter` | `@ingissa/navcore-google-maps` | @types/google.maps |
-
----
-
-## `VoiceTriggerEngine`
-
-```typescript
-const voice = new VoiceTriggerEngine({ earlyTriggerMeters: 120 });
-voice.setInstructions(instructions)
-const cue = voice.update(state)     //          VoiceCue | null
-voice.onInstruction(instr, state)   //          VoiceCue (direct)
-voice.reset()
-
-interface VoiceCue {
-  text: string;
-  distanceMetres: number;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  triggerId: string;
-}
-```
-
----
-
-## `ETAEngine`
-
-```typescript
-const eta = new ETAEngine({ speedWindowSize: 6 });
-const result = eta.update(state);
-
-interface ETAResult {
-  etaSeconds: number;
-  etaMs: number;
-  distanceRemainingM: number;
-  averageSpeedMs: number;
-  isReliable: boolean;
-}
-```
-
----
-
-## `GeofencingEngine`
-
-### Constructor
-
-```typescript
-const geo = new GeofencingEngine(options?: GeofencingOptions);
-
-interface GeofencingOptions {
-  dwellThresholdMs?: number;    // default: 10 000 ms
-  onEvent?: (event: GeofenceEvent) => void;  // global callback
-  zones?: ZoneDefinition[];     // register zones at creation time
-}
-```
-
-### Methods
-
-```typescript
-// Registration          name is the human-readable label shown in events
-geo.addCircle(id: string, name: string, center: Coordinate, radiusM: number, meta?: unknown): string
-geo.addPolygon(id: string, name: string, coords: Coordinate[], meta?: unknown): string
-geo.remove(id: string): void
-geo.clear(): void
-geo.listIds(): string[]
-
-// Runtime
-const events = geo.update(coord: Coordinate)       //          GeofenceEvent[]
-geo.isInside(id: string, coord: Coordinate)        //          boolean
-```
-
-### `GeofenceEvent`
-
-```typescript
-interface GeofenceEvent {
-  id: string;              // matches the id passed to addCircle / addPolygon
-  name: string;            // human-readable label (e.g. 'School Zone')
-  type: 'enter' | 'exit' | 'dwell';
-  coord: Coordinate;       // coordinate that triggered the event
-  dwellMs?: number;        // populated for 'exit' and 'dwell' events
-  meta?: unknown;          // custom metadata passed at registration
-}
-```
-
-### Example
-
-```typescript
-const geo = new GeofencingEngine({ dwellThresholdMs: 5000 });
-
-geo.addCircle('school-zone', 'School Zone', [2.347, 48.859], 50, { speedLimit: 30 });
-geo.addPolygon('exam-area', 'Exam District', [
-  [2.34, 48.85], [2.36, 48.85], [2.36, 48.87], [2.34, 48.87],
-]);
-
-engine.on('update', ({ snappedCoord }) => {
-  const events = geo.update(snappedCoord);
-  for (const evt of events) {
-    console.log(`${evt.type}: ${evt.name} (${evt.id})`);
-    if (evt.type === 'dwell') console.log(`  inside for ${evt.dwellMs}ms`);
-  }
+const nav = createNavigationSession({
+  provider: new OSRMDirectionsProvider({ baseUrl: 'https://router.project-osrm.org' }),
+  engineOptions: { isDev: true },
 });
+
+// A. Origin & Destination
+await nav.navigate({ origin: [-6.84, 34.02], destination: [-6.80, 34.04] });
+
+// B. Ordered routing waypoints
+await nav.navigate({ coordinates: [[-6.84, 34.02], [-6.82, 34.03], [-6.80, 34.04]] });
+
+// Typed subscriptions
+const unsubscribe = nav.subscribe('instruction', (instr) => console.log(instr.text));
 ```
 
----
-
-## `ParallelRoadResolver`
-
+### `NavCore` Constructor Options (`NavCoreOptions`)
 ```typescript
-const resolver = new ParallelRoadResolver({ bearingPenalty: 80 });
-const best = resolver.resolveBest(candidates, vehicleBearing, prevSegmentIdx);
-const all = resolver.resolve(candidates, vehicleBearing, prevSegmentIdx);
-const uturn = resolver.isLikelyUTurn(bearing, segA, segB);
+interface NavCoreOptions {
+  licenseKey?: string;           // Commercial key (default: '')
+  isDev?: boolean;                // Developer bypass (default: false)
+  isCircuit?: boolean;            // Closed-loop circuit route (default: false)
+  kalmanQ?: number;               // Process noise (default: 0.00001)
+  kalmanRBase?: number;           // Measurement noise base (default: 0.00005)
+  baseCorridorMeters?: number;    // Corridor at low speed (default: 25)
+  maxCorridorMeters?: number;     // Corridor ceiling (default: 60)
+  arrivalThresholdMeters?: number;// Arrival detection radius (default: 30)
+  bearingSmoothingAlpha?: number; // Heading EMA alpha (default: 0.3)
+}
 ```
 
----
-
-## `HeadlessAdapter`          Test Assertions
-
-```typescript
-const adapter = new HeadlessAdapter();
-adapter.assertReached([lng, lat], 30)   // throws if not reached within 30m
-adapter.assertArrived()                  // throws if hasArrived never true
-adapter.assertNeverOffRoute()            // throws if ever off-route
-adapter.getHistory()                     //          PositionRecord[]
-adapter.reset()
-```
+> [!WARNING]
+> **Client-Side Environment Variables Notice:**
+> Any environment variable prefixed with `EXPO_PUBLIC_` (such as `EXPO_PUBLIC_NAVCORE_LICENSE_KEY`) is bundled in plaintext into the client application binary. Never use it to store private backend credentials. See [Licensing & Verification](./licensing.md) for full security specifications.

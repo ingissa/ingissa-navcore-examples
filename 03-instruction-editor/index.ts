@@ -1,5 +1,5 @@
-/**
- * Example 03 - Instruction Editor
+﻿/**
+ * Example 03 â€” Instruction Editor
  *
  * Demonstrates:
  * - Building a NavInstruction array from scratch using InstructionEditor
@@ -7,7 +7,7 @@
  * - Attaching offsets to route geometry
  * - Using instructions with the NavCore engine
  *
- * Run: npx tsx 03-instruction-editor/index.ts
+ * Run: npx tsx examples/03-instruction-editor/index.ts
  */
 
 import {
@@ -15,7 +15,6 @@ import {
   InstructionEditor,
   OSRMDirectionsProvider,
 } from '@ingissa/navcore-core';
-import { PARIS_MOCK_ROUTE, MOCK_FALLBACK_MESSAGE } from '../shared/mock-data';
 
 async function main() {
   const provider = new OSRMDirectionsProvider({
@@ -29,28 +28,21 @@ async function main() {
     [2.3009, 48.8741],
   ];
 
-  let route;
-  try {
-    console.log('Fetching route from OSRM...');
-    route = await provider.getRoute(waypoints);
-  } catch {
-    console.log(MOCK_FALLBACK_MESSAGE);
-    route = PARIS_MOCK_ROUTE;
-  }
-  
+  console.log('Fetching route...');
+  const route = await provider.getRoute(waypoints);
   const geometry = route.geometry;
   console.log(`Route: ${geometry.length} points\n`);
 
-  // -- Build instructions ----------------------------------------------------
+  // â”€â”€ Build instructions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const editor = new InstructionEditor();
 
   editor
     .addDepart(geometry[0]!, 'Head north on Rue de Rivoli')
     .addTurn(
       geometry[Math.floor(geometry.length * 0.25)]!,
-      'Turn left onto Avenue des Champs-Elysées',
+      'Turn left onto Avenue des Champs-Ã‰lysÃ©es',
       Math.floor(geometry.length * 0.25),
-      { meta: { streetName: 'Avenue des Champs-Elysées' } }
+      { meta: { streetName: 'Avenue des Champs-Ã‰lysÃ©es' } }
     )
     .addExamPoint(
       geometry[Math.floor(geometry.length * 0.4)]!,
@@ -90,19 +82,16 @@ async function main() {
     }
   });
 
-  // -- Use instructions with engine ------------------------------------------
+  // â”€â”€ Use instructions with engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   console.log('\n=== Running navigation ===\n');
 
-  const DEV_BYPASS_KEY =
-    'eyJ0IjoicHJvIiwiZXhwIjo0OTMyNzAzMTU2MDAwLCJiaWQiOiJkZXYuYnlwYXNzIiwiZiI6WyIqIl19.MEQCIH4E4QNu9PuVsXHSnYmcqpCLk4QitiIH9hhY0Zm+YO5gAiAE7X3c47YQLUj7WPSGKw9Y7W2kBUR5GCnOMBwdBsYGgg==';
-
-  const engine = new NavCore({ licenseKey: DEV_BYPASS_KEY });
+  const engine = new NavCore({ isDev: true });
   engine.setRoute(geometry, editor.toArray());
   engine.startNavigation();
 
   engine.on('instruction', (instr: any) => {
-    const r = editor.toRichArray().find(rich => rich.geometryIndex === instr.geometryIndex);
-    const tag = r?.type === 'exam_point' ? `[!]   [${r.severity}]` : '   ';
+    const rich = editor.toRichArray().find(r => r.geometryIndex === instr.geometryIndex);
+    const tag = rich?.type === 'exam_point' ? `âš ï¸  [${rich.severity}]` : 'ðŸ—£ ';
     console.log(`${tag} ${instr.text}`);
   });
 

@@ -1,82 +1,51 @@
-# NavCore SDK - Examples Hub
+# NavCore SDK — Examples Suite & Documentation
 
-Welcome to the **NavCore SDK Examples Hub**! This directory contains a comprehensive set of interactive examples designed to demonstrate the power of the `@ingissa/navcore-sdk` navigation engine. 
-
-## 🚀 Premium Web Demos
-Examples **04 (MapLibre)** and **05 (Leaflet)** have been upgraded to premium, mobile-first interactive demos.
-
-- **Smartphone Device Frame**: Experience the SDK as it would appear on a real mobile device.
-- **Course-Up Navigation**: Intelligent camera management that keeps the vehicle heading "Top" (available in both MapLibre and Leaflet).
-- **Collapsible HUD**: Modern glassmorphism UI banner that can be toggled to maximize map visibility.
-- **SDK Engineering View**: Toggle **Route Snapping** and **GPS Smoothing** in real-time to see the "before and after" impact of the core engine.
-- **Synthetic GPS Noise**: Simulated 15m jitter shows how the SDK handles real-world noisy signals.
+Standalone, runnable examples and complete documentation for the NavCore SDK. All examples are runnable with `npx tsx`.
 
 ---
 
-## 🛠️ Installation & Setup
-
-Before running any web-based example, ensure all dependencies are installed:
+## Prerequisites
 
 ```bash
-# In this directory (apps/navcore/examples)
 npm install
 ```
 
 ---
 
-## 💻 Running the Examples
+## Running the Examples
 
-### **Web-Based Interactive Demos (04, 05)**
+| # | Example Name | Feature Demonstrated | How to Run | Network? |
+|---|---|---|---|---|
+| 01 | [Basic Navigation](./01-basic-navigation/) | `createNavigationSession`, OSRM, typed events | `npx tsx 01-basic-navigation/index.ts` | ✅ OSRM |
+| 02 | [Custom Route Builder](./02-custom-route-builder/) | `CustomRouteBuilder`, GPX/GeoJSON export, chunking | `npx tsx 02-custom-route-builder/index.ts` | ✅ OSRM |
+| 03 | [Instruction Editor](./03-instruction-editor/) | `InstructionEditor`, checkpoints, maneuvers | `npx tsx 03-instruction-editor/index.ts` | ✅ OSRM |
+| 04 | [MapLibre Web](./04-maplibre-web/) | MapLibre GL JS browser navigation UI generator | `npx tsx 04-maplibre-web/index.ts > maplibre.html` | ✅ OSRM |
+| 05 | [Leaflet Web](./05-leaflet-web/) | Leaflet.js browser navigation UI generator | `npx tsx 05-leaflet-web/index.ts > leaflet.html` | ✅ OSRM |
+| 06 | [Directions Providers](./06-directions-providers/) | Multi-provider routing (OSRM, Valhalla, ORS, Mapbox) | `npx tsx 06-directions-providers/index.ts` | ✅ All providers |
+| 07 | [Voice Triggers](./07-voice-triggers/) | `VoiceTriggerEngine`, priority cues, TTS timing | `npx tsx 07-voice-triggers/index.ts` | ✅ OSRM |
+| 08 | [ETA Engine](./08-eta-engine/) | `ETAEngine`, rolling average speed, stop handling | `npx tsx 08-eta-engine/index.ts` | ✅ OSRM |
+| 09 | [Geofencing](./09-geofencing/) | `GeofencingEngine`, circle/polygon zones, dwell | `npx tsx 09-geofencing/index.ts` | ❌ None (Offline) |
+| 10 | [Parallel Road Resolver](./10-parallel-road-resolver/) | `ParallelRoadResolver`, U-turn anti-snap | `npx tsx 10-parallel-road-resolver/index.ts` | ❌ None (Offline) |
+| 11 | [Headless Testing](./11-headless-testing/) | Automated CI/CD navigation verification | `npx tsx 11-headless-testing/index.ts` | ✅ OSRM |
 
-These use **Vite** for a fast, modern development experience.
-
-```bash
-# Start the dev server
-npm run dev
-
-# Access the demos:
-# MapLibre: http://localhost:5173/04-maplibre-web/index.html
-# Leaflet:  http://localhost:5173/05-leaflet-web/index.html
-```
-
-### **CLI & Headless Examples (01 - 03, 07 - 11)**
-
-Node-based examples can be run directly using `tsx`:
-
-```bash
-# Basic navigation state logs
-npx tsx 01-basic-navigation/index.ts
-
-# Offline geofencing engine
-npx tsx 09-geofencing/index.ts
-
-# Headless performance testing
-npx tsx 11-headless-testing/index.ts
-```
+> [!NOTE]
+> Examples 09 (`09-geofencing`) and 10 (`10-parallel-road-resolver`) run 100% offline without any network connectivity.
 
 ---
 
-## 📊 Compatibility Matrix
+## Documentation Index
 
-| Example | Title | Renderer | Key Features |
-|---------|-------|----------|--------------|
-| **04** | MapLibre Web | MapLibre GL | 3D Pitch, Built-in Rotation, Vector Tiles |
-| **05** | Leaflet Web | Leaflet.js | CSS Rotation, Raster Tiles, Lightweight |
-| **01** | Basic Nav | Headless | Core Snapping Logic |
-| **08** | ETA Engine | Headless | Predictive ETAs |
-| **09** | Geofencing | Headless | Offline Zone Detection |
-
----
-
-## 🏗️ Architecture
-
-Below is the standard premium pipeline utilized across both the web visualizers and the React Native suite:
-
-```mermaid
-graph TD
-    A[GPS Source / Jittered] -->|Raw Lat, Long| B[KalmanFilter2D]
-    B -->|Filtered Signal| C[RouteSnapper]
-    C -->|Snapped Coord| D[NavCore Engine]
-    D -->|NavCoreState| E[Map Adapter]
-    E -->|Course-Up| F[Smartphone UI]
-```
+- **Core & Concepts:**
+  - [Getting Started Guide](./docs/getting-started.md)
+  - [Installation Matrix](./docs/installation.md)
+  - [Pipeline Architecture & State Machines](./docs/concepts.md)
+  - [Directions Providers](./docs/directions-providers.md)
+- **Platforms:**
+  - [React Native Integration Guide](./docs/react-native.md)
+  - [GPS Simulation & Replay Guide](./docs/simulator.md)
+- **Reference & Operations:**
+  - [100% Export API Reference](./docs/api-reference/)
+  - [Licensing & Offline Verification](./docs/licensing.md)
+  - [Known Limitations](./docs/limitations.md)
+  - [Troubleshooting](./docs/troubleshooting.md)
+  - [Migration Guide](./docs/migration-1.0.4-to-1.0.9.md)
