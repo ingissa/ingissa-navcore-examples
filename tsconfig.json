@@ -16,6 +16,7 @@
   ],
   "exclude": [
     "node_modules",
-    "12-expo-complete-navigation"
+    "12-expo-complete-navigation",
+    "vite.config.ts"
   ]
 }
