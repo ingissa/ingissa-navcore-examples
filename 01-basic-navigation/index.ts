@@ -1,5 +1,5 @@
 ﻿/**
- * Example 01 â€” Basic Navigation
+ * Example 01 — Basic Navigation
  *
  * Demonstrates the recommended integration path:
  * - createNavigationSession with an OSRM provider
@@ -12,7 +12,7 @@
 import { createNavigationSession, OSRMDirectionsProvider } from '@ingissa/navcore-core';
 
 async function main() {
-  // â”€â”€ 1. Create a session with a routing provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- 1. Create a session with a routing provider ---------------------------
   const provider = new OSRMDirectionsProvider({
     baseUrl: 'http://router.project-osrm.org',
     profile: 'driving',
@@ -24,31 +24,31 @@ async function main() {
     engineOptions: { isDev: true, arrivalThresholdMeters: 20 },
   });
 
-  // â”€â”€ 2. Listen to typed events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- 2. Listen to typed events ----------------------------------------------
   nav.subscribe('routeLoaded', (plan) => {
-    console.log(`âœ“ Route loaded (${plan.geometry.length} points)`);
+    console.log(`✓ Route loaded (${plan.geometry.length} points)`);
   });
 
   nav.subscribe('instruction', (instr) => {
-    console.log(`ðŸ—£  Instruction: ${instr.text ?? instr.instruction}`);
+    console.log(`🗣  Instruction: ${instr.text ?? instr.instruction}`);
   });
 
   nav.subscribe('arrival', () => {
-    console.log('ðŸ Arrived!');
+    console.log('🏁 Arrived!');
   });
 
   nav.subscribe('deviation', ({ anchorIndex }) => {
-    console.log(`âš ï¸  Off-route at segment ${anchorIndex}`);
+    console.log(`⚠️  Off-route at segment ${anchorIndex}`);
   });
 
-  // â”€â”€ 3. Navigate by origin and destination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- 3. Navigate by origin and destination ---------------------------------
   const plan = await nav.navigate({
     origin: [2.3522, 48.8566],
     destination: [2.3009, 48.8741],
   });
   console.log(`Route: ${plan.geometry.length} points, ${(plan.distanceM / 1000).toFixed(1)}km, ${Math.round(plan.durationS / 60)}min`);
 
-  // â”€â”€ 4. Simulate GPS updates along the route â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- 4. Simulate GPS updates along the route -------------------------------
   console.log('\nSimulating navigation...\n');
 
   for (let i = 0; i < plan.geometry.length; i += 5) {
@@ -72,7 +72,7 @@ async function main() {
       const dist = state.distanceToDestination;
       console.log(
         `  [${i}] idx=${state.routeIndex}  ` +
-        `dist=${dist !== null ? (dist / 1000).toFixed(2) + 'km' : 'â€”'}  ` +
+        `dist=${dist !== null ? (dist / 1000).toFixed(2) + 'km' : '—'}  ` +
         `offRoute=${state.isOffRoute}  ` +
         `arrived=${state.hasArrived}`
       );

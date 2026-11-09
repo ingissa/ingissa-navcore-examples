@@ -1,5 +1,5 @@
 ﻿/**
- * Example 06 â€” Directions Providers Comparison
+ * Example 06 — Directions Providers Comparison
  *
  * Fetches the same route from all three built-in providers
  * and compares the results side by side.
@@ -29,21 +29,21 @@ async function fetchSafe(
     const t0 = Date.now();
     const result = await fn();
     const ms = Date.now() - t0;
-    console.log(`âœ… ${name}`);
+    console.log(`✅ ${name}`);
     console.log(`   Points : ${result.geometry.length}`);
     console.log(`   Distance: ${(result.distance / 1000).toFixed(2)} km`);
     console.log(`   Duration: ${Math.round(result.duration / 60)} min`);
     console.log(`   Time    : ${ms}ms\n`);
   } catch (err: any) {
-    console.log(`âŒ ${name}: ${err.message}\n`);
+    console.log(`❌ ${name}: ${err.message}\n`);
   }
 }
 
 async function main() {
   console.log('=== Directions Provider Comparison ===\n');
-  console.log(`Route: [${START}] â†’ [${END}]\n`);
+  console.log(`Route: [${START}] → [${END}]\n`);
 
-  // 1. OSRM (public server â€” use self-hosted in production)
+  // 1. OSRM (public server — use self-hosted in production)
   await fetchSafe('OSRM (public demo)', () =>
     new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' })
       .getRoute([START, END])
@@ -63,10 +63,10 @@ async function main() {
         .getRoute([START, END])
     );
   } else {
-    console.log('âš ï¸  ORS_KEY not set â€” skipping OpenRouteService\n');
+    console.log('⚠️  ORS_KEY not set — skipping OpenRouteService\n');
   }
 
-  // 4. Profile switching â€” all providers support the DirectionsOptions interface
+  // 4. Profile switching — all providers support the DirectionsOptions interface
   console.log('=== Profile comparison (OSRM) ===\n');
   const osrm = new OSRMDirectionsProvider({ baseUrl: 'http://router.project-osrm.org' });
 
