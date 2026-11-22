@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Navigation POC",
+    "slug": "navigation-poc",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "plugins": [
+      "@maplibre/maplibre-react-native",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Navigation POC to use your location while navigation is open."
+        }
+      ],
+      "expo-asset"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.udereva.app"
+    },
+    "android": {
+      "package": "com.udereva.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  }
+}
