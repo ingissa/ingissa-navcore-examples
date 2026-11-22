@@ -1,6 +1,49 @@
 # NavCore SDK — Examples Suite & Documentation
 
+> **Version 2.0.0** — Harmonized for Navcore V2 ecosystem. See [NAVCORE_ECOSYSTEM_V2_FINAL](../navcore-sdk/NAVCORE_ECOSYSTEM_V2_FINAL/) for the full integration report.
+
 Standalone, runnable examples and complete documentation for the NavCore SDK. All examples are runnable with `npx tsx`.
+
+---
+
+## Repository Structure (V2)
+
+```
+ingissa-navcore-examples/
+├── apps/
+│   └── navigation-poc/     <- Primary app: full Expo/React Native navigation demo
+│                              Physical location: E:\WORKSPACE\expo_projects\navigation-poc\mobile\
+├── scripts/
+│   └── install-local-sdk.mjs  <- Install V2 SDK tarballs locally (before npm publish)
+├── docs/                   <- SDK guides and API reference
+├── 01-basic-navigation/    <- TypeScript examples 01-11 (see table below)
+└── ...
+```
+
+### Running the Primary App (navigation-poc)
+
+The main Expo app is at `E:\WORKSPACE\expo_projects\navigation-poc\mobile\`:
+
+```bash
+cd E:/WORKSPACE/expo_projects/navigation-poc/mobile
+npx expo start
+```
+
+See [`apps/navigation-poc/README.md`](./apps/navigation-poc/README.md) for full instructions and scenario guide.
+
+### Installing Local V2 SDK Tarballs
+
+Before the SDK is published to npm, install local V2 tarballs into any project:
+
+```bash
+# Into this repo
+node scripts/install-local-sdk.mjs
+
+# Into the POC
+npm run install:local-sdk:poc
+```
+
+---
 
 ---
 

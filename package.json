@@ -1,10 +1,12 @@
 {
   "name": "ingissa-navcore-examples",
-  "version": "1.0.11",
+  "version": "2.0.0",
   "private": true,
-  "description": "Runnable code examples, integration guides, and documentation for the NavCore SDK.",
+  "description": "Official examples, integration guides, and primary Expo/React Native POC for the NavCore SDK 2.0.0.",
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "install:local-sdk": "node scripts/install-local-sdk.mjs",
+    "install:local-sdk:poc": "node scripts/install-local-sdk.mjs --target ../navigation-poc/mobile",
     "start": "tsx 01-basic-navigation/index.ts",
     "start:01": "tsx 01-basic-navigation/index.ts",
     "start:02": "tsx 02-custom-route-builder/index.ts",
@@ -20,11 +22,11 @@
     "dev:05": "vite --open 05-leaflet-web/index.html"
   },
   "dependencies": {
-    "@ingissa/navcore-core": "^1.0.11",
-    "@ingissa/navcore-mapbox": "^1.0.11",
-    "@ingissa/navcore-react-native": "^1.0.11",
-    "@ingissa/navcore-simulator": "^1.0.11",
-    "@ingissa/navcore-types": "^1.0.11",
+    "@ingissa/navcore-core": "^2.0.0",
+    "@ingissa/navcore-mapbox": "^2.0.0",
+    "@ingissa/navcore-react-native": "^2.0.0",
+    "@ingissa/navcore-simulator": "^2.0.0",
+    "@ingissa/navcore-types": "^2.0.0",
     "leaflet": "^1.9.4",
     "maplibre-gl": "^4.7.1"
   },
