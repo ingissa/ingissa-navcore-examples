@@ -22,13 +22,10 @@ export interface MapRendererAdapter {
 
 ---
 
-## 1.0.9 Ecosystem Rendering Status
+## V2 Ecosystem Rendering Status
 
-> [!IMPORTANT]
-> **Notice on Legacy Adapter Packages:**
-> Early experimental packages (`@ingissa/navcore-maplibre`, `@ingissa/navcore-leaflet`, `@ingissa/navcore-google-maps`, and `@ingissa/navcore-headless`) are **private** and not published in the 1.0.9 release.
->
-> In modern NavCore applications, rendering is implemented directly in userland by consuming state from `nav.update()` or `useNavSelector()`, avoiding external wrapper overhead.
+> [!NOTE]
+> All adapter packages (`@ingissa/navcore-maplibre`, `@ingissa/navcore-leaflet`, `@ingissa/navcore-google-maps`, and `@ingissa/navcore-headless`) are published in v2.x. In React Native or custom UIs, you can also render directly in userland by consuming state from `nav.update()` or `useNavSelector()`.
 
 ---
 

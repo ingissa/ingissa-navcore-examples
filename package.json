@@ -1,8 +1,8 @@
 {
   "name": "ingissa-navcore-examples",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
-  "description": "Official examples, integration guides, and primary Expo/React Native POC for the NavCore SDK 2.0.0.",
+  "description": "Official examples, integration guides, and primary Expo/React Native POC for the NavCore SDK 2.1.0.",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "install:local-sdk": "node scripts/install-local-sdk.mjs",
@@ -22,11 +22,11 @@
     "dev:05": "vite --open 05-leaflet-web/index.html"
   },
   "dependencies": {
-    "@ingissa/navcore-core": "^2.0.0",
-    "@ingissa/navcore-mapbox": "^2.0.0",
-    "@ingissa/navcore-react-native": "^2.0.0",
-    "@ingissa/navcore-simulator": "^2.0.0",
-    "@ingissa/navcore-types": "^2.0.0",
+    "@ingissa/navcore-core": "^2.1.0",
+    "@ingissa/navcore-mapbox": "^2.1.0",
+    "@ingissa/navcore-react-native": "^2.1.0",
+    "@ingissa/navcore-simulator": "^2.1.0",
+    "@ingissa/navcore-types": "^2.1.0",
     "leaflet": "^1.9.4",
     "maplibre-gl": "^4.7.1"
   },

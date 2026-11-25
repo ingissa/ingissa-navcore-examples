@@ -1,28 +1,24 @@
 ﻿# Installation & Packaging Guide
 
-This document details package installation, peer dependencies, subpath imports, and runtime configuration for NavCore 1.0.9.
+This document details package installation, peer dependencies, subpath imports, and runtime configuration for NavCore 2.1.0.
 
 ---
 
-## Public Packages Matrix (1.0.9)
+## Public Packages Matrix (2.1.0)
 
-Only the following **five packages** are published and maintained in 1.0.9:
+All **nine packages** are published under `@ingissa/navcore-*`:
 
 | Package | Version | Runtime Dependencies | Required Peer Dependencies | Optional Peer Dependencies |
 |---|---|---|---|---|
-| `@ingissa/navcore-core` | `1.0.9` | 0 | None | None |
-| `@ingissa/navcore-types` | `1.0.9` | 0 | None | None |
-| `@ingissa/navcore-mapbox` | `1.0.9` | 0 | `@ingissa/navcore-core: ^1.0.9` | `@rnmapbox/maps: >=10.0.0` |
-| `@ingissa/navcore-react-native` | `1.0.9` | 0 | `@ingissa/navcore-core: ^1.0.9`<br>`react: >=18.0.0`<br>`react-native: >=0.72.0` | `react-native-maps: >=1.0.0` |
-| `@ingissa/navcore-simulator` | `1.0.9` | 0 | `@ingissa/navcore-core: ^1.0.9` | `react: >=18`<br>`react-native: >=0.72` |
-
-> [!WARNING]
-> **Deprecated Packages Warning:**
-> The `1.0.7` and `1.0.8` releases of `@ingissa/navcore-react-native` and `@ingissa/navcore-simulator`, as well as the `1.0.8` releases of `@ingissa/navcore-mapbox` and `@ingissa/navcore-types`, contained broken entrypoints and are deprecated on npm. **Always install version `1.0.9`.**
-
-> [!CAUTION]
-> **Unpublished Packages:**
-> Legacy or internal packages `@ingissa/navcore-google-maps`, `@ingissa/navcore-headless`, `@ingissa/navcore-leaflet`, and `@ingissa/navcore-maplibre` are **private** (not published in 1.0.9). Do not attempt to `npm install` them. Map rendering is managed in userland by binding state to your UI map of choice.
+| `@ingissa/navcore-core` | `2.1.0` | 0 | None | None |
+| `@ingissa/navcore-types` | `2.1.0` | 0 | None | None |
+| `@ingissa/navcore-mapbox` | `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0` | `@rnmapbox/maps: >=10.0.0` |
+| `@ingissa/navcore-react-native` | `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0`<br>`react: >=18.0.0`<br>`react-native: >=0.72.0` | `react-native-maps: >=1.0.0` |
+| `@ingissa/navcore-simulator` | `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0` | `react: >=18`<br>`react-native: >=0.72` |
+| `@ingissa/navcore-headless` | `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0` | None |
+| `@ingissa/navcore-maplibre` | `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0`, `maplibre-gl` | None |
+| `@ingissa/navcore-leaflet` | `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0`, `leaflet` | None |
+| `@ingissa/navcore-google-maps` | `2.0.0` / `2.1.0` | 0 | `@ingissa/navcore-core: ^2.1.0` | None |
 
 ---
 

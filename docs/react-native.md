@@ -22,7 +22,7 @@ npm install @ingissa/navcore-react-native @ingissa/navcore-core
 ```
 
 Ensure your project fulfills the peer dependency requirements:
-- `@ingissa/navcore-core`: `^1.0.9`
+- `@ingissa/navcore-core`: `^2.1.0`
 - `react`: `>=18.0.0`
 - `react-native`: `>=0.72.0`
 - `react-native-maps`: `>=1.0.0` (optional)
@@ -42,7 +42,7 @@ export default function App() {
   return (
     <NavCoreProvider
       options={{
-        isDev: true, // Development mode: unlocks all features without a license key
+        isDev: true, // Development mode only: unlocks Pro modules in non-production builds (ignored in production)
         baseCorridorMeters: 25,
         maxCorridorMeters: 60,
         arrivalThresholdMeters: 30,

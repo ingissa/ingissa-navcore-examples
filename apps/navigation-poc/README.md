@@ -1,66 +1,67 @@
 # NavCore Navigation POC
 
-> **Exemple principal officiel** du SDK Navcore 2.0.0 — Application Expo / React Native démontrant un pipeline de navigation complet avec MapLibre et routage Valhalla local.
+> **Official primary example** for NavCore SDK **2.1.0** — Expo / React Native application demonstrating a complete turn-by-turn navigation pipeline with MapLibre and local Valhalla routing.
+>
+> [Version française (README.fr.md)](./README.fr.md)
 
-Ce dossier est l'intégration officielle du POC dans le dépôt d'exemples Navcore. Il constitue un **exemple vivant maintenu avec le SDK**, et non une démonstration statique ou une capture d'écran.
+This directory is the official POC integration inside `ingissa-navcore-examples`. It is a **living reference app maintained alongside the SDK**, not a static demo.
 
 ---
 
-## Ce que démontre ce POC
+## What This POC Demonstrates
 
-| Fonctionnalité | Détail |
+| Feature | Details |
 |---|---|
-| **Navigation bout en bout** | Valhalla local → NavCore → rendu MapLibre |
-| **Déviation depuis la position courante** | Bouton "Simulate deviation here" — sans reset de route |
-| **Confirmation OFF_ROUTE** | FSM NavCore : fenêtre de 2 secondes basée sur les timestamps GPS |
-| **Rerouting Valhalla** | Recalcul depuis la position exacte hors-corridor vers la destination d'origine |
-| **Visualisation du corridor** | Route, corridor, trace GPS brute, trace snappée, trajectoire de déviation |
-| **HUD diagnostique** | 10 métriques en temps réel, collapsible, états FSM live |
-| **Asset véhicule** | Symbole PNG avec bearing NavCore, positionné sur la coordonnée snappée |
-| **GPS foreground** | Permission et tracking réel sur device |
-| **Replay de scénarios** | Fixtures JSON de scénarios de navigation reproductibles |
+| **End-to-end navigation** | Local Valhalla → NavCore → MapLibre rendering |
+| **Live deviation from current position** | `"Simulate deviation here"` button — without resetting the route |
+| **OFF_ROUTE confirmation** | NavCore FSM: 2-second window driven by GPS timestamps |
+| **Valhalla rerouting** | Recalculates from the exact off-corridor position to the original destination |
+| **Corridor visualization** | Route, corridor, raw GPS trace, snapped trace, simulated deviation trajectory |
+| **Diagnostic HUD** | 10 real-time metrics, collapsible panel, live FSM states |
+| **Vehicle asset** | PNG symbol rotated by NavCore bearing on the snapped coordinate |
+| **Foreground GPS** | Permission handling and real-device tracking |
+| **Scenario replay** | Reproducible JSON navigation scenario fixtures |
 
 > [!IMPORTANT]
-> Ce POC démontre la correction V2 clé : une sortie persistante du corridor fait évoluer l'état de `DEVIATING` vers `OFF_ROUTE` en utilisant les **timestamps GPS** (et non la vitesse de rendu React). Cela garantit un comportement déterministe indépendant des performances du device.
+> This POC demonstrates the key V2 deterministic behavior: a persistent corridor breach transitions the state from `DEVIATING` to `OFF_ROUTE` using **GPS timestamps** (rather than React render cadence), ensuring consistent behavior regardless of device frame rate.
 
 ---
 
-## Architecture du pipeline
+## Pipeline Architecture
 
-```
+```text
 GPS fix
-  → filtrage / bearing
-  → snapping vers la géométrie de route
-  → corridor dynamique
-  → OffRouteFSM (DEVIATING → OFF_ROUTE après 2 s GPS)
-  → progression / instructions / état public
-  → rendu MapLibre + rerouting Valhalla
+  → filtering / bearing
+  → snapping onto route geometry
+  → dynamic corridor
+  → OffRouteFSM (DEVIATING → OFF_ROUTE after 2s GPS time)
+  → progress / instructions / public state
+  → MapLibre rendering + Valhalla rerouting
 ```
 
-### Packages SDK utilisés
+### SDK Packages Used
 
-| Package | Version | Rôle |
+| Package | Version | Role |
 |---|---|---|
-| `@ingissa/navcore-core` | `^2.0.0` | Moteur de navigation, FSM, corridor |
-| `@ingissa/navcore-react-native` | `^2.0.0` | Hooks React Native, `useNavCore`, sélecteurs |
-| `@ingissa/navcore-simulator` | `^2.0.0` | Générateur de trajectoires de déviation |
+| `@ingissa/navcore-core` | `^2.1.0` | Navigation engine, FSM, corridor |
+| `@ingissa/navcore-react-native` | `^2.1.0` | React Native hooks, `useNavCore`, selectors |
+| `@ingissa/navcore-simulator` | `^2.1.0` | Deviation trajectory generator |
 
 ---
 
-## Prérequis
+## Prerequisites
 
 - Node.js 20+
 - `npx expo` (Expo CLI)
-- Emulateur Android ou device physique Android avec Expo Dev Client
-- Serveur Valhalla local (voir [docs/local-valhalla.md](../../docs/local-valhalla.md))
-- Une licence Navcore Suite valide (voir [docs/license-setup.md](../../docs/license-setup.md))
+- Android emulator or physical Android device with Expo Dev Client
+- Local Valhalla server (see [Directions Providers](../../docs/directions-providers.md)) or fixture mode
+- Optional NavCore Suite license key for Pro modules in production (see [Licensing & Offline Verification](../../docs/licensing.md))
 
 ---
 
 ## Installation
 
 ```bash
-# Depuis la racine du dépôt ingissa-navcore-examples
 cd apps/navigation-poc
 npm install
 ```
@@ -73,136 +74,129 @@ npm install
 cp .env.example .env
 ```
 
-Éditer `.env` :
+Edit `.env`:
 
 ```env
 APP_VARIANT=development
 EXPO_PUBLIC_ROUTE_MODE=valhalla
 EXPO_PUBLIC_VALHALLA_URL=http://10.0.2.2:8002
-EXPO_PUBLIC_NAVCORE_LICENSE_KEY=<votre-token-de-licence>
+EXPO_PUBLIC_NAVCORE_LICENSE_KEY=<your-license-key>
 EXPO_PUBLIC_NAVCORE_APPLICATION_ID=com.udereva.app
 EXPO_PUBLIC_NAVCORE_DEV_MODE=false
 ```
 
 > [!NOTE]
-> `10.0.2.2` est l'adresse de l'hôte depuis un émulateur Android. Sur device physique, utiliser l'IP locale de la machine hébergeant Valhalla.
+> `10.0.2.2` resolves to the host machine from an Android emulator. On a physical device, use the local LAN IP of the machine running Valhalla.
 
 > [!NOTE]
-> `EXPO_PUBLIC_ROUTE_MODE=fixture` permet de tester sans serveur Valhalla en utilisant les fixtures JSON embarquées.
+> `EXPO_PUBLIC_ROUTE_MODE=fixture` lets you test without a running Valhalla server by using the bundled JSON fixtures.
+
+> [!NOTE]
+> `EXPO_PUBLIC_NAVCORE_DEV_MODE=true` (`isDev: true`) unlocks Pro modules **only in non-production builds**. In release/production builds (`globalThis.__DEV__ === false` or `NODE_ENV === 'production'`), `isDev` is ignored and a valid Suite license key bound to `applicationId` is required for Pro modules.
 
 ---
 
-## Lancement
+## Running the App
 
 ```bash
 # Dev server
 npx expo start --dev-client
 
-# Build Android direct
+# Direct Android build
 npx expo run:android
 ```
 
 ---
 
-## États de navigation (HUD)
+## Navigation States (HUD)
 
-| Label HUD | Signification |
+| HUD Label | Meaning |
 |---|---|
-| `ON ROUTE` | Véhicule dans le corridor, navigation active |
-| `APPROACHING ROUTE` | Session démarrée, déplacement vers le début de route |
-| `DEVIATION · CONFIRMING FOR 2 s` | Hors corridor — FSM NavCore accumule le temps GPS |
-| `OFF ROUTE · CONFIRMED` | 2 s écoulées hors corridor — rerouting déclenché |
-| `RECALCULATING · REQUESTED` | Requête Valhalla dispatchée |
-| `RECALCULATING · RECEIVED` | Valhalla a répondu, nouvelle route en cours d'application |
-| `RECALCULATING · RESUMING` | Nouvelle route chargée, navigation repart |
+| `ON ROUTE` | Vehicle inside corridor, active navigation |
+| `APPROACHING ROUTE` | Session started, moving toward route start |
+| `DEVIATION · CONFIRMING FOR 2 s` | Outside corridor — NavCore FSM accumulating GPS time |
+| `OFF ROUTE · CONFIRMED` | 2s elapsed outside corridor — rerouting triggered |
+| `RECALCULATING · REQUESTED` | Valhalla request dispatched |
+| `RECALCULATING · RECEIVED` | Valhalla responded, applying new route |
+| `RECALCULATING · RESUMING` | New route loaded, navigation resumed |
 
 ---
 
-## Scénario de déviation (démonstration principale)
+## Deviation Scenario (Main Demo)
 
-1. Lancer une session de navigation (GPS réel ou point sur la carte)
-2. Attendre l'état `ON ROUTE`
-3. Appuyer sur **"Simulate deviation here"** — déclenche une trajectoire GPS simulée de 10 s / 51 points depuis la position courante
-4. Observer `DEVIATION · CONFIRMING FOR 2 s` — NavCore chronomètre la sortie du corridor
-5. Après ~2 secondes, `OFF ROUTE · CONFIRMED` apparaît et le rerouting commence
-6. La trajectoire rose pointillée représente le chemin simulé ; la trace rouge marque la déviation confirmée
+1. Start a navigation session (real GPS or map point)
+2. Wait for the `ON ROUTE` state
+3. Tap **"Simulate deviation here"** — triggers a simulated 10s / 51-point GPS trajectory from the current position
+4. Observe `DEVIATION · CONFIRMING FOR 2 s` — NavCore times the corridor breach
+5. After ~2 seconds, `OFF ROUTE · CONFIRMED` appears and rerouting begins
+6. The dashed pink trajectory shows the simulated path; the red trace marks the confirmed deviation
 
 > [!NOTE]
-> La trajectoire simulée est **clairement identifiée visuellement** (rose pointillée). Le comportement GPS réel est distinct du mode simulation.
+> The simulated trajectory is **visually distinct** (dashed pink). Real GPS behavior is separate from simulation mode.
 
 ---
 
-## Modes de replay
+## Replay Modes
 
-| Variable d'env | Valeur | Effet |
+| Env Variable | Value | Effect |
 |---|---|---|
-| `EXPO_PUBLIC_ROUTE_MODE` | `fixture` | Utilise les fixtures JSON au lieu de Valhalla |
-| `EXPO_PUBLIC_NAVCORE_REPLAY_DIAGNOSTICS` | `true` | Logs détaillés de replay |
-| `EXPO_PUBLIC_NAVCORE_CAPTURED_REPLAY` | `true` | Rejoue une trace capturée de wrong-turn |
+| `EXPO_PUBLIC_ROUTE_MODE` | `fixture` | Uses bundled JSON fixtures instead of Valhalla |
+| `EXPO_PUBLIC_NAVCORE_REPLAY_DIAGNOSTICS` | `true` | Detailed replay diagnostics logs |
+| `EXPO_PUBLIC_NAVCORE_CAPTURED_REPLAY` | `true` | Replays a captured wrong-turn GPS trace |
 
 ---
 
-## Structure du code
+## Project Structure
 
-```
+```text
 apps/navigation-poc/
-├── App.tsx                          # Composant racine, orchestration complète
-├── app.json / app.config.js         # Config Expo
-├── metro.config.js                  # Config Metro (consommateur npm pur)
-├── tsconfig.json                    # TypeScript strict
-├── index.ts                         # Point d'entrée Expo
-├── .env.example                     # Variables d'environnement documentées
-├── assets/                          # Icônes app, sprite véhicule
+├── App.tsx                          # Root component and full orchestration
+├── app.json / app.config.js         # Expo configuration
+├── metro.config.js                  # Metro configuration
+├── tsconfig.json                    # Strict TypeScript config
+├── index.ts                         # Expo entry point
+├── .env.example                     # Documented environment variables
+├── assets/                          # App icons and vehicle sprite
 ├── plugins/
-│   └── withAndroidCleartextTraffic.js  # Plugin Expo (HTTP local dev uniquement)
+│   └── withAndroidCleartextTraffic.js  # Expo plugin (APP_VARIANT=development HTTP only)
 ├── src/
 │   ├── components/
-│   │   └── GuidanceMap.tsx          # Carte MapLibre + overlays
+│   │   └── GuidanceMap.tsx          # MapLibre map + overlays
 │   ├── location/
-│   │   ├── locationSample.ts        # Typage des samples GPS
-│   │   └── useForegroundLocation.ts # Hook GPS foreground
+│   │   ├── locationSample.ts        # GPS sample types
+│   │   └── useForegroundLocation.ts # Foreground GPS hook
 │   ├── navigation/
-│   │   ├── atomicSessionStart.ts    # Démarrage atomique de session
-│   │   ├── freshReroute.ts          # Rerouting depuis position courante
+│   │   ├── atomicSessionStart.ts    # Atomic session startup
+│   │   ├── freshReroute.ts          # Rerouting from current position
 │   │   ├── licenseRuntimeDiagnostics.ts
-│   │   ├── navigationViewModel.ts   # ViewModel états/HUD
+│   │   ├── navigationViewModel.ts   # HUD/state ViewModel
 │   │   ├── rerouteAttemptCoordinator.ts
-│   │   ├── timestampedReplay.ts     # Replay avec timestamps GPS réels
-│   │   ├── types.ts                 # Types internes
-│   │   ├── useNavigationSession.ts  # Hook session de navigation
-│   │   ├── useReplaySource.ts       # Source GPS : réel ou replay
-│   │   ├── useRerouteOnOffRoute.ts  # Déclencheur de rerouting
-│   │   ├── wrongTurnReplay.ts       # Scénario wrong-turn
+│   │   ├── timestampedReplay.ts     # Replay with real GPS timestamps
+│   │   ├── types.ts                 # Internal types
+│   │   ├── useNavigationSession.ts  # Navigation session hook
+│   │   ├── useReplaySource.ts       # GPS source: real or replay
+│   │   ├── useRerouteOnOffRoute.ts  # Reroute trigger
+│   │   ├── wrongTurnReplay.ts       # Wrong-turn scenario
 │   │   └── fixtures/
 │   │       └── capturedWrongTurnReplay.ts
 │   └── routing/
-│       ├── routeMetrics.ts          # Progression, distance
-│       ├── valhallaAdapter.ts       # Adaptation route Valhalla → NavCore
-│       ├── valhallaClient.ts        # Client HTTP Valhalla
-│       └── valhallaFixture.ts       # Fixture statique Valhalla
+│       ├── routeMetrics.ts          # Progress and distance helpers
+│       ├── valhallaAdapter.ts       # Valhalla → NavCore route adapter
+│       ├── valhallaClient.ts        # Valhalla HTTP client
+│       └── valhallaFixture.ts       # Static Valhalla fixture
 └── tests/
     └── fixtures/
         └── navigation/
-            └── key-mode-fixtures.json  # Scénarios GPS reproductibles
+            └── key-mode-fixtures.json  # Reproducible GPS scenarios
 ```
 
 ---
 
-## Limitations connues
+## Known Limitations
 
-- Android uniquement (iOS non testé)
-- Pas de localisation en arrière-plan
-- Tiles OpenFreeMap nécessitent une connexion internet (Valhalla peut être 100% local)
-- Pas de guidage vocal en production
-- Pas de cartes hors-ligne
-- La révocation de licence hors-ligne n'est pas instantanée (limitation inhérente au modèle de vérification locale)
-
----
-
-## Relation avec le POC source
-
-Ce dossier est l'intégration officielle du POC originel situé à `navigation-poc/mobile/`.
-Le POC originel conserve son historique Git, ses scripts de test avancés et sa documentation de recherche.
-Cet exemple dans `ingissa-navcore-examples` est la version maintenue, alignée sur le SDK 2.0.0 publié.
-
-Les scripts de test avancés (key-matrix, replay diagnostics, license probes) restent dans le repo POC originel et ne sont pas inclus ici pour maintenir la simplicité de l'exemple.
+- Android only (iOS untested)
+- No background location tracking
+- OpenFreeMap tiles require internet connectivity (Valhalla can run 100% locally)
+- No production voice guidance TTS integration
+- No offline map tiles
+- Offline license revocation is not instantaneous (inherent to offline ECDSA verification)
