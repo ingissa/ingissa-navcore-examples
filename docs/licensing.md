@@ -1,31 +1,38 @@
 # Licensing & Offline Key Verification
 
 > [!NOTE]
-> **Owner & Legal Notice:**
-> The following document accurately describes the offline license verification behavior implemented in `@ingissa/navcore-core`. Statements regarding copyright, rights grants, and compliance expectations must be reviewed by legal counsel before customer distribution.
+> **Plain-Language Summary (License v0.2):**
+> This document summarizes the NavCore SDK License Agreement v0.2 and the offline ECDSA P-256 verification implemented in `@ingissa/navcore-core`. **En cas de divergence, le fichier [LICENSE](https://github.com/ingissa/navcore-sdk/blob/main/LICENSE) (et [navcore-web.vercel.app/license](https://navcore-web.vercel.app/license)) prévaut** (see also the courtesy French translation in [LICENSE.fr.md](https://github.com/ingissa/navcore-sdk/blob/main/LICENSE.fr.md)).
 
 ---
 
-## License Terms
+## License Tiers & Pricing (v0.2)
 
-All packages and source code in the NavCore SDK repository are proprietary:
+| Tier | Scope & Rights | Pricing & Updates |
+|---|---|---|
+| **Core (Free)** | Free to use in **development and production** across unlimited applications. Includes core navigation, map matching, and all adapters including **`@ingissa/navcore-mapbox`**. | **0 USD** (free). |
+| **Suite** | Unlocks all **Pro Modules** for **1 Application** (development and production), bound to that application's bundle ID or domain (`applicationId`). | **49 USD** per app, includes **12 months** of updates. Renewal: **25 USD/app/year** (optional; never disables existing keys). |
+| **Studio** | Grants Suite rights for up to **10 Applications** (including client applications), each with its own license key. | **349 USD**. |
+| **Enterprise** | Custom volume, SLA, source/escrow, or custom terms. | Custom quote. |
 
-```text
-Copyright (c) 2026 Abdelnasser Aitabi. All rights reserved.
-No license is granted except by separate written agreement.
-```
+- **Pro Modules** gated by a Suite / Studio / Enterprise key:
+  - Dead Reckoning (`dead_reckoning`)
+  - Compound Deviation Detection (`compound_deviation`)
+  - Parallel Road Resolver (`parallel_road_resolution`)
+  - `VoiceTriggerEngine` (`voice_triggers`)
+  - `ETAEngine` (`eta`)
+  - `GeofencingEngine` (`geofencing`)
+- **Security Patches**: Free for at least **24 months** after the first release of the major version you hold.
+- **Refund & Reissue**: 14-day refund window. One license key reissue included; further reissues are **10 USD**.
+- **Acquiring a Commercial License**: [https://navcore-web.vercel.app/pricing](https://navcore-web.vercel.app/pricing)
 
-The `package.json` manifest of each package declares `"license": "SEE LICENSE IN LICENSE"`. No open-source or permissive license (such as MIT) is granted for current releases.
-
-### Acquiring a Commercial License
-Commercial subscriptions and production license keys are distributed through:
-👉 [https://navcore-web.vercel.app/pricing](https://navcore-web.vercel.app/pricing)
+The `package.json` manifest of each package declares `"license": "SEE LICENSE IN LICENSE"`.
 
 ---
 
 ## Technical Architecture of the License Key
 
-NavCore implements offline license verification in [`packages/core/src/license/LicenseManager.ts`](file:///E:/WORKSPACE/expo_projects/navcore-sdk/packages/core/src/license/LicenseManager.ts).
+NavCore implements offline license verification in `@ingissa/navcore-core` (`LicenseManager`).
 
 ### 1. Key Anatomy
 
@@ -39,8 +46,16 @@ Decoding the first segment yields a JSON object:
 
 ```typescript
 export interface LicensePayload {
-  /** Expiration timestamp in milliseconds since Unix epoch */
-  exp: number;
+  /** Version 2 denotes the Navcore Suite commercial contract. */
+  v?: 2;
+  /** Opaque server-issued license identifier. */
+  lid?: string;
+  /** Commercial product identifier. */
+  pid?: 'navcore-suite';
+  /** Issuance timestamp in milliseconds. */
+  iat?: number;
+  /** Optional legacy expiration timestamp in milliseconds. */
+  exp?: number;
   /** Bundle ID or domain specified during issuance */
   bid: string;
   /** Granular feature entitlement flags */
@@ -53,9 +68,7 @@ export interface LicensePayload {
 ### 3. Cryptographic Signature & Verification
 
 - **Algorithm**: ECDSA over NIST curve P-256 (secp256r1) with SHA-256.
-- **Embedded Public Key**: The uncompressed SEC1 public key is embedded directly into the SDK binary:
-  `BJOqJyZiZFrURbrIkkuvXXHTjV+MS9kp5uAGTvnWI0sp3yYi+Me7axMvNDCJi37ZJwVk/6iNM+6MeEO1TS97Xug=`
-  In asymmetric cryptography (ECDSA), the public key is designed to be public and is used solely to verify signatures. Exposing the public key does not weaken the cryptographic scheme: an attacker cannot forge signatures or issue valid license keys without access to the secret private key held securely on the license issuance server.
+- **Embedded Public Key**: The uncompressed SEC1 public key is embedded directly into the SDK binary. In asymmetric cryptography (ECDSA), the public key is designed to be public and is used solely to verify signatures.
 - **Runtime Cryptography**: Verification executes via the standard WebCrypto API (`crypto.subtle`) when available. If the host environment does not provide `crypto.subtle` (such as certain React Native runtimes), the SDK falls back to a bundled implementation powered by `@noble/curves`.
 
 ### 4. Verification Workflow
@@ -63,32 +76,37 @@ export interface LicensePayload {
 When `license.validate(key)` executes:
 1. Splits the string on `.`. Returns `'INVALID'` if either part is missing.
 2. Decodes and parses the payload JSON.
-3. Checks expiration: if `Date.now() > payload.exp`, returns `'EXPIRED'`.
-4. Cryptographically verifies the signature over the payload bytes using the embedded P-256 public key.
-5. Populates the set of enabled feature flags and transitions status to `'VALID'`.
+3. For a V2 Suite key, confirms that its `bid` equals `applicationId` supplied to the SDK.
+4. Checks expiration only when an `exp` claim exists. V2 Suite keys omit it deliberately and are perpetual for the licensed version.
+5. Cryptographically verifies the signature over the payload bytes using the embedded P-256 public key.
+6. Populates the set of enabled feature flags and transitions status to `'VALID'`.
 
 ---
 
 ## Verified Security Realities & Technical Limits
 
-To maintain technical accuracy and avoid creating unwarranted security or legal expectations, developers and integrators must understand the following technical limits of the offline validation model:
+### 1. Application Binding Requires an Explicit Runtime Value
+V2 Suite keys are bound to `applicationId` supplied by the integrator:
 
-### 1. Bundle ID is Not Enforced at Runtime
-While the license payload contains a `bid` field (e.g. `com.example.app`), the `LicenseManager` implementation **does not compare `bid` against the host application's package name or bundle ID at runtime**. Any application holding a validly signed payload will pass verification.
+```ts
+const nav = new NavCore({
+  licenseKey: process.env.NAVCORE_LICENSE_KEY,
+  applicationId: 'com.example.app',
+});
+```
+
+The SDK rejects a V2 key when `applicationId` is missing or differs from `bid`. It cannot independently discover a trustworthy package identifier across every JavaScript runtime, so the runtime value remains client-controlled and is an entitlement control rather than hardware DRM.
 
 ### 2. Client-Side Keys Are Extractable (`EXPO_PUBLIC_`)
 In mobile or single-page web applications, environment variables (such as `EXPO_PUBLIC_NAVCORE_LICENSE_KEY`) are incorporated directly into the compiled JavaScript bundle in plain text.
-- Any end-user can extract the key by decompressing the `.apk`/`.ipa` or inspecting the web bundle.
 - **Do not store private backend credentials or secret tokens in the license key or client environment variables.**
 
 ### 3. Entitlement Gating vs DRM
-The license key mechanism functions as an offline feature entitlement gate, **not as anti-tamper digital rights management (DRM)**. It verifies whether an authorized customer is operating within their contractual term, but does not prevent client-side reverse engineering or code modification.
+The license key mechanism functions as an offline feature entitlement gate, **not as anti-tamper digital rights management (DRM)**. A V2 Suite key is perpetual for the licensed version and does not require recurring server validation; therefore a later server-side revocation cannot immediately affect a fully offline installation.
 
 ---
 
 ## Feature Flags (`FeatureKey`)
-
-Features in NavCore are gated by string keys defined in [`packages/core/src/features.ts`](file:///E:/WORKSPACE/expo_projects/navcore-sdk/packages/core/src/features.ts):
 
 | Feature Key | Constant Symbol | Description |
 |---|---|---|
@@ -116,19 +134,22 @@ When a consumer attempts to invoke a gated feature without an active license, th
 
 ## Development Mode (`isDev: true`)
 
-During local engineering, testing, and CI runs:
+During local engineering, testing, and CI runs (`NODE_ENV !== 'production'` and `globalThis.__DEV__ !== false`):
 ```typescript
 const nav = createNavigationSession({
   provider,
   engineOptions: { isDev: true },
 });
 ```
-When `isDev === true`, `license.hasFeature()` unconditionally returns `true` for all features without requiring a key or cryptographic signature check.
+In non-production runtimes, when `isDev === true`, `license.hasFeature()` returns `true` for all features without requiring a key and logs a one-time `console.warn` (`[NavCore] Development mode: Pro modules unlocked for development only. Not licensed for production use.`).
+
+In production builds (`process.env.NODE_ENV === 'production'` or React Native release builds where `globalThis.__DEV__ === false`), `isDev: true` is **ignored**: `license.hasFeature()` remains gated by a valid signed license key, and a one-time `console.error` (`[NavCore] isDev is ignored in production builds. Pro modules require a valid license key.`) is emitted.
 
 ---
 
-## Key Rotation Best Practices
+## Perpetual Suite and key rotation
 
-1. **Set Realistic Expirations**: Request keys with standard annual expiration dates (`exp`).
-2. **Handle Expiration Gracefully**: Monitor `nav.getState().licenseStatus`. When status transitions to `'EXPIRED'`, the engine continues basic snapping but halts Pro feature additions.
-3. **Remote Configuration**: Fetch the current license key from your authorized backend API on application startup rather than hardcoding long-lived strings in mobile application binaries.
+1. **Keep the private signing key server-side.** The SDK contains only the public verifier.
+2. **Use `applicationId`.** It must exactly match the bundle ID or domain submitted at purchase.
+3. **Reissue deliberately.** One reissue per license key is free, and each additional reissue is 10 USD.
+4. **Plan key rotation.** Add and honour a key identifier before introducing a second public key. Existing offline tokens cannot be retroactively changed.
