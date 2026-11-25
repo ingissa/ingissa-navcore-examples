@@ -5,8 +5,6 @@
   "description": "Official examples, integration guides, and primary Expo/React Native POC for the NavCore SDK 2.1.0.",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "install:local-sdk": "node scripts/install-local-sdk.mjs",
-    "install:local-sdk:poc": "node scripts/install-local-sdk.mjs --target ../navigation-poc/mobile",
     "start": "tsx 01-basic-navigation/index.ts",
     "start:01": "tsx 01-basic-navigation/index.ts",
     "start:02": "tsx 02-custom-route-builder/index.ts",
