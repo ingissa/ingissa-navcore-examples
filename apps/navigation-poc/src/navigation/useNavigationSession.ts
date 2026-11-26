@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import type { LicenseStatus, NavCoreOptions, NavInstruction } from '@ingissa/navcore-core';
 import { useNavCore } from '@ingissa/navcore-react-native';
+import { TelemetryClient, attachNavCoreTelemetry } from '@ingissa/navcore-telemetry';
 import {
   collectLicenseRuntimeDiagnostics,
   navCorePackageVersions,
@@ -47,6 +49,28 @@ export function useNavigationSession(
     isNavigating: route !== null,
     options,
   });
+
+  useEffect(() => {
+    const enabled = process.env.EXPO_PUBLIC_NAVCORE_TELEMETRY_ENABLED !== 'false';
+    const client = new TelemetryClient({
+      enabled,
+      endpoint: process.env.EXPO_PUBLIC_NAVCORE_TELEMETRY_ENDPOINT || 'https://navcore-license-server.vercel.app',
+      applicationId: options.applicationId,
+      licenseKey: options.licenseKey,
+      environment: __DEV__ ? 'development' : 'production',
+      platform: Platform.OS === 'ios' ? 'ios' : Platform.OS === 'android' ? 'android' : 'unknown',
+      osVersion: String(Platform.Version ?? ''),
+      sdkVersion: '2.1.0',
+    });
+
+    void client.start();
+    const detach = attachNavCoreTelemetry(navigation.engine, client);
+
+    return () => {
+      detach();
+      void client.shutdown();
+    };
+  }, [navigation.engine, options.applicationId, options.licenseKey]);
 
   const startAtomicSession = useCallback(
     (initialLocation: LocationSample) => {
